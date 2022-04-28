@@ -158,7 +158,7 @@ public class RequestHelper extends AbstractRequestHelper {
       //分片上传文件
       while ((bytesRead = dataInputStream.read(segmentData)) > 0) {
         totalRead = totalRead + bytesRead;
-        LOGGER.debug("Chunked appened, segment index:" + segmentIndex + " bytes:" + totalRead + "/" + dataBytes.length);
+        LOGGER.info("Chunked appened, segment index:" + segmentIndex + " bytes:" + totalRead + "/" + dataBytes.length);
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(segmentData, 0, bytesRead);
         byte[] byteArray = IOUtils.toByteArray(byteArrayInputStream);
         uploadMediaChunkedAppend(fileName, byteArray, segmentIndex, initUploadMediaResponse.get().getMediaId(), url);
@@ -246,7 +246,7 @@ public class RequestHelper extends AbstractRequestHelper {
       if (state.equals("pending") || state.equals("in_progress")) {
         currentProgressPercent = Objects.isNull(uploadMediaChunkedFinalize0.getProgressPercent()) ? 0 : uploadMediaChunkedFinalize0.getProgressPercent();
         int waitSec = Math.max(uploadMediaChunkedFinalize0.getProcessingCheckAfterSecs(), 1);
-        LOGGER.debug("Chunked finalize, wait for:" + waitSec + " sec");
+        LOGGER.info("Chunked finalize, wait for:" + waitSec + " sec");
         try {
           Thread.sleep(waitSec * 1000);
         } catch (InterruptedException e) {
@@ -290,7 +290,7 @@ public class RequestHelper extends AbstractRequestHelper {
     request.addQuerystringParameter("command", CHUNKED_STATUS);
     request.addQuerystringParameter("media_id", String.valueOf(mediaId));
     String chunkedFinalize00 = makeRequest(request, true);
-    LOGGER.debug("Status response:" + chunkedFinalize00);
+    LOGGER.info("Status response:" + chunkedFinalize00);
     return new UploadedMedia(JSON.parseObject(chunkedFinalize00));
   }
 }
