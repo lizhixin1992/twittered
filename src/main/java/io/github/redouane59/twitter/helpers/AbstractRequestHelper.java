@@ -109,6 +109,7 @@ public abstract class AbstractRequestHelper {
     } else if (response.getCode() < 200 || response.getCode() > 299) {
       logApiError(request.getVerb().name(), request.getUrl(), stringResponse, response.getCode());
     }
+    LOGGER.info("stringResponse : {}", stringResponse);
     result = convert(stringResponse, classType);
     return Optional.ofNullable(result);
   }
@@ -117,4 +118,35 @@ public abstract class AbstractRequestHelper {
 
   public abstract <T> Optional<T> getRequestWithParameters(String url, Map<String, String> parameters, Class<T> classType);
 
+
+  @SneakyThrows
+  public String makeRequest(OAuthRequest request, boolean signRequired) {
+    if (signRequired) {
+      signRequest(request);
+    }
+    Response response       = getService().execute(request);
+    String   stringResponse = response.getBody();
+    if (response.getCode() == 429) {
+      if (!automaticRetry) {
+        throw new LimitExceededException();
+      }
+      int    retryAfter    = DEFAULT_RETRY_AFTER_SEC;
+      String retryAfterStr = response.getHeader("Retry-After");
+      if (retryAfterStr != null) {
+        try {
+          retryAfter = Integer.parseInt(retryAfterStr);
+        } catch (NumberFormatException e) {
+          LOGGER.error("Using default retry after because header format is invalid: " + retryAfterStr, e);
+        }
+      }
+      LOGGER.info("Rate limit exceeded, new retry in " + ConverterHelper.getSecondsAsText(retryAfter) + " at " + ConverterHelper.minutesBeforeNow(
+              -retryAfter / 60).format(DateTimeFormatter.ofPattern("HH:mm")));
+      Thread.sleep(1000L * retryAfter);
+      return makeRequest(request, false);
+    } else if (response.getCode() < 200 || response.getCode() > 299) {
+      logApiError(request.getVerb().name(), request.getUrl(), stringResponse, response.getCode());
+    }
+    LOGGER.info("stringResponse : {}", stringResponse);
+    return stringResponse;
+  }
 }

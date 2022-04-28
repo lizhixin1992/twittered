@@ -191,6 +191,10 @@ public class URLHelper {
     return "https://upload.twitter.com/1.1/media/upload.json?media_category=" + mediaCategory.label;
   }
 
+  public String getUploadMediaUrl() {
+    return "https://upload.twitter.com/1.1/media/upload.json";
+  }
+
   public String getCollectionsCreateUrl() {
     return ROOT_URL_V1
            + COLLECTIONS
