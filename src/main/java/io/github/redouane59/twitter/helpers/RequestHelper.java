@@ -129,20 +129,20 @@ public class RequestHelper extends AbstractRequestHelper {
           LOGGER.error(String.format(Locale.US,
                   "video file can't be longer than: %d MBytes",
                   MAX_VIDEO_SIZE / MB));
-          throw new Exception();
+          throw new RuntimeException("video file can't be longer than: " + MAX_VIDEO_SIZE / MB + " MBytes");
         }
       }else if(MediaCategory.TWEET_GIF.label.equals(mediaCategory)){
         if (dataBytes.length > MAX_GIF_SIZE) {
           LOGGER.error(String.format(Locale.US,
                   "gif file can't be longer than: %d MBytes",
                   MAX_GIF_SIZE / MB));
-          throw new Exception();
+          throw new RuntimeException("gif file can't be longer than: " + MAX_GIF_SIZE / MB + " MBytes");
         }
       }
 
     } catch (IOException ioe) {
       LOGGER.error("Failed to download the file.", ioe);
-      throw new Exception();
+      throw new RuntimeException("Failed to download the file.", ioe);
     }
 
     try {
@@ -173,7 +173,7 @@ public class RequestHelper extends AbstractRequestHelper {
       return (Optional<T>) Optional.ofNullable(uploadMediaResponse);
     } catch (Exception e) {
       LOGGER.error("uploadMediaChunked is error.", e);
-      throw new Exception();
+      throw new RuntimeException("uploadMediaChunked is error..", e);
     }
   }
 
@@ -241,7 +241,7 @@ public class RequestHelper extends AbstractRequestHelper {
       String state = uploadMediaChunkedFinalize0.getProcessingState();
       if (state.equals("failed")) {
         LOGGER.error("Failed to finalize the chuncked upload.");
-        throw new Exception("Failed to finalize the chuncked upload.");
+        throw new RuntimeException("Failed to finalize the chuncked upload.");
       }
       if (state.equals("pending") || state.equals("in_progress")) {
         currentProgressPercent = Objects.isNull(uploadMediaChunkedFinalize0.getProgressPercent()) ? 0 : uploadMediaChunkedFinalize0.getProgressPercent();
@@ -251,7 +251,7 @@ public class RequestHelper extends AbstractRequestHelper {
           Thread.sleep(waitSec * 1000);
         } catch (InterruptedException e) {
           LOGGER.error("Failed to finalize the chuncked upload.", e);
-          throw new Exception("Failed to finalize the chuncked upload.");
+          throw new RuntimeException("Failed to finalize the chuncked upload.", e);
         }
       }
       if (state.equals("succeeded")) {
@@ -261,7 +261,7 @@ public class RequestHelper extends AbstractRequestHelper {
       uploadMediaChunkedFinalize0 = uploadMediaChunkedStatus(mediaId, url);
     }
     LOGGER.error("Failed to finalize the chuncked upload, progress has stopped, tried " + tries + 1 + " times.");
-    throw new Exception("Failed to finalize the chuncked upload, progress has stopped, tried " + tries + 1 + " times.");
+    throw new RuntimeException("Failed to finalize the chuncked upload, progress has stopped, tried " + tries + 1 + " times.");
   }
 
   /**

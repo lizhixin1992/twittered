@@ -1260,8 +1260,8 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
         InputStream input = new ByteArrayInputStream(data);
         return requestHelperV1.uploadMediaChunked(url, mediaName, input, UploadMediaResponse.class, mediaCategory.label).orElseThrow(NoSuchElementException::new);
       }catch (Exception e){
-        LOGGER.error("",e);
-        return new UploadMediaResponse();
+          LOGGER.error("uploadMedia is Exception!", e);
+          throw new RuntimeException(e);
       }
     }
   }
@@ -1279,8 +1279,8 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
         InputStream input = new ByteArrayInputStream(data);
         return requestHelperV1.uploadMediaChunked(url, imageFile.getName(), input, UploadMediaResponse.class, mediaCategory.label).orElseThrow(NoSuchElementException::new);
       }catch (Exception e){
-        LOGGER.error("",e);
-        return new UploadMediaResponse();
+          LOGGER.error("uploadMedia is Exception!", e);
+          throw new RuntimeException(e);
       }
     }
   }
