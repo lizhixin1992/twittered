@@ -1,14 +1,14 @@
 package io.github.redouane59.twitter.helpers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.scribejava.apis.TwitterApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth10aService;
-import io.github.redouane59.twitter.TwitterClient;
 import io.github.redouane59.twitter.signature.TwitterCredentials;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Optional;
@@ -41,15 +41,7 @@ public abstract class AbstractRequestHelper {
   }
 
   public static void logApiError(String method, String url, String stringResponse, int code) {
-    LOGGER.error("(" + method + ") Error calling " + url + " " + stringResponse + " - " + code);
-  }
-
-  protected <T> T convert(String json, Class<? extends T> targetClass) throws JsonProcessingException {
-    if (targetClass.isInstance(json)) {
-      return (T) json;
-    } else {
-      return TwitterClient.OBJECT_MAPPER.readValue(json, targetClass);
-    }
+    LOGGER.error("({}) Error calling {} {} - {}", method, url, stringResponse, code);
   }
 
   protected abstract void signRequest(OAuthRequest request);
@@ -73,7 +65,7 @@ public abstract class AbstractRequestHelper {
       }
     }
     if (body != null && verb.isPermitBody()) {
-      request.setPayload(body);
+      request.setPayload(body.getBytes(StandardCharsets.UTF_8));
       if (!request.getHeaders().containsKey("Content-Type")) {
         request.addHeader("Content-Type", "application/json");
       }
@@ -87,30 +79,33 @@ public abstract class AbstractRequestHelper {
     if (signRequired) {
       signRequest(request);
     }
-    Response response       = getService().execute(request);
-    String   stringResponse = response.getBody();
-    if (response.getCode() == 429) {
-      if (!automaticRetry) {
-        throw new LimitExceededException();
-      }
-      int    retryAfter    = DEFAULT_RETRY_AFTER_SEC;
-      String retryAfterStr = response.getHeader("Retry-After");
-      if (retryAfterStr != null) {
-        try {
-          retryAfter = Integer.parseInt(retryAfterStr);
-        } catch (NumberFormatException e) {
-          LOGGER.error("Using default retry after because header format is invalid: " + retryAfterStr, e);
+    try (Response response = getService().execute(request)) {
+      String stringResponse = response.getBody();
+      if (response.getCode() == 429) {
+        if (!automaticRetry) {
+          throw new LimitExceededException();
         }
+        int    retryAfter    = DEFAULT_RETRY_AFTER_SEC;
+        String retryAfterStr = response.getHeader("x-rate-limit-reset");
+        if (retryAfterStr != null) {
+          try {
+            retryAfter = Integer.parseInt(retryAfterStr);
+          } catch (NumberFormatException e) {
+            LOGGER.error("Using default retry after because header format is invalid: {}", retryAfterStr, e);
+          }
+        }
+        LOGGER.info("Rate limit exceeded, new retry in {} at {}", ConverterHelper.getSecondsAsText(retryAfter), ConverterHelper.minutesBeforeNow(
+            -retryAfter / 60).format(DateTimeFormatter.ofPattern("HH:mm")));
+        Thread.sleep(1000L * retryAfter);
+        return makeRequest(request, false, classType); // We have already signed if it was requested
+      } else if (response.getCode() < 200 || response.getCode() > 299) {
+        logApiError(request.getVerb().name(), request.getUrl(), stringResponse, response.getCode());
       }
-      LOGGER.info("Rate limit exceeded, new retry in " + ConverterHelper.getSecondsAsText(retryAfter) + " at " + ConverterHelper.minutesBeforeNow(
-          -retryAfter / 60).format(DateTimeFormatter.ofPattern("HH:mm")));
-      Thread.sleep(1000L * retryAfter);
-      return makeRequest(request, false, classType); // We have already signed if it was requested
-    } else if (response.getCode() < 200 || response.getCode() > 299) {
-      logApiError(request.getVerb().name(), request.getUrl(), stringResponse, response.getCode());
+      LOGGER.info("stringResponse : {}", stringResponse);
+      result = JsonHelper.fromJson(stringResponse, classType);
+    } catch (IOException ex) {
+      LOGGER.error("Error occupied on executing request", ex);
     }
-    LOGGER.info("stringResponse : {}", stringResponse);
-    result = convert(stringResponse, classType);
     return Optional.ofNullable(result);
   }
 
