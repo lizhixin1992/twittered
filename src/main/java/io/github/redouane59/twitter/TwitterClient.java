@@ -104,7 +104,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     public static final String TWEET_FIELDS = "tweet.fields";
     public static final String
             ALL_TWEET_FIELDS =
-            "attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
+            "non_public_metrics,organic_metrics,attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
     public static final String EXPANSION = "expansions";
     public static final String
             ALL_EXPANSIONS =
@@ -114,7 +114,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
             "id,created_at,entities,username,name,location,url,verified,profile_image_url,public_metrics,pinned_tweet_id,description,protected";
     public static final String MEDIA_FIELD = "media.fields";
     public static final String ALL_MEDIA_FIELDS =
-            "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
+            "non_public_metrics,organic_metrics,duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
     public static final String SPACE_FIELDS = "space.fields";
     public static final String
             ALL_SPACE_FIELDS =
@@ -1432,5 +1432,47 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
             throw new IllegalArgumentException();
         }
         return accessToken.substring(0, accessToken.indexOf("-"));
+    }
+
+
+    /*----------------------------------------------------------------------------------------------------------------*/
+
+    public static final String
+            ALL_EXPANSIONS_NON =
+            "author_id,entities.mentions.username,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,attachments.media_keys,geo.place_id";
+    public static final String
+            ALL_TWEET_FIELDS_NON =
+            "non_public_metrics,organic_metrics,attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
+
+    public static final String ALL_MEDIA_FIELDS_NON =
+            "non_public_metrics,organic_metrics,duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
+    @Override
+    public Tweet getTweetNON(String tweetId) {
+        String url = getUrlHelper().getTweetUrl(tweetId);
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put(EXPANSION, ALL_EXPANSIONS_NON);
+        parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS_NON);
+        parameters.put(MEDIA_FIELD, ALL_MEDIA_FIELDS_NON);
+        return getRequestHelper().getRequestWithParameters(url, parameters, TweetV2.class).orElseThrow(NoSuchElementException::new);
+    }
+
+    @Override
+    public TweetList getTweetsNON(List<String> tweetIds) {
+        String url = getUrlHelper().getTweetsUrl();
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put(EXPANSION, ALL_EXPANSIONS_NON);
+        parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS_NON);
+        parameters.put(MEDIA_FIELD, ALL_MEDIA_FIELDS_NON);
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        while (i < tweetIds.size() && i < URLHelper.MAX_LOOKUP) {
+            String id = tweetIds.get(i);
+            result.append(id);
+            result.append(",");
+            i++;
+        }
+        result.delete(result.length() - 1, result.length());
+        parameters.put("ids", result.toString());
+        return getRequestHelper().getRequestWithParameters(url, parameters, TweetList.class).orElseThrow(NoSuchElementException::new);
     }
 }

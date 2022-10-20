@@ -652,4 +652,19 @@ public interface ITwitterClientV2 {
   boolean deleteTweet(String tweetId);
 
 
+  /**
+   * Get a tweet from its id calling https://api.twitter.com/2/tweets
+   *
+   * @param tweetId id of the tweet
+   * @return a tweet object
+   */
+  Tweet getTweetNON(String tweetId);
+
+  /**
+   * Get a tweet list from their id calling https://api.twitter.com/2/tweets
+   *
+   * @param tweetIds the ids of the tweets
+   * @return a tweet object list
+   */
+  TweetList getTweetsNON(List<String> tweetIds);
 }
