@@ -10,6 +10,7 @@ import io.github.redouane59.twitter.dto.others.RateLimitStatus;
 import io.github.redouane59.twitter.dto.others.RequestToken;
 import io.github.redouane59.twitter.dto.tweet.MediaCategory;
 import io.github.redouane59.twitter.dto.tweet.Tweet;
+import io.github.redouane59.twitter.dto.tweet.TweetParameters;
 import io.github.redouane59.twitter.dto.tweet.UploadMediaResponse;
 import java.io.File;
 import java.time.LocalDateTime;
@@ -186,4 +187,19 @@ public interface ITwitterClientV1 {
    */
   DmEvent postDm(String text, String userId);
 
+  /**
+   * Creates a Tweet on behalf of an authenticated user calling https://api.twitter.com/1.1/statuses/update.json
+   *
+   * @param text Text of the Tweet being created.
+   * @return the created tweet, only with id and text fields
+   */
+  Tweet postTweetV1(String text);
+
+  /**
+   * Creates a Tweet on behalf of an authenticated user calling https://api.twitter.com/1.1/statuses/update.json
+   *
+   * @param tweetParameters object containing additional parameters. See https://developer.twitter.com/en/docs/twitter-api/v1/tweets/post-and-engage
+   * @return the created tweet, only with id and text fields
+   */
+  Tweet postTweetV1(TweetParameters tweetParameters);
 }

@@ -311,4 +311,9 @@ public class URLHelper {
   public String getOwnedListUrl(String userId) {
     return ownedListUrl.replace(idVariable, userId);
   }
+
+
+
+  @Getter
+  private final String postTweetUrlV1           = "https://api.twitter.com/1.1/statuses/update.json";
 }

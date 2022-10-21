@@ -64,10 +64,12 @@ import io.github.redouane59.twitter.helpers.RequestHelper;
 import io.github.redouane59.twitter.helpers.RequestHelperV2;
 import io.github.redouane59.twitter.helpers.URLHelper;
 import io.github.redouane59.twitter.signature.TwitterCredentials;
+import io.github.redouane59.twitter.utils.GlobalAuthUtils;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -104,7 +106,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     public static final String TWEET_FIELDS = "tweet.fields";
     public static final String
             ALL_TWEET_FIELDS =
-            "non_public_metrics,organic_metrics,attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
+            "attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
     public static final String EXPANSION = "expansions";
     public static final String
             ALL_EXPANSIONS =
@@ -114,7 +116,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
             "id,created_at,entities,username,name,location,url,verified,profile_image_url,public_metrics,pinned_tweet_id,description,protected";
     public static final String MEDIA_FIELD = "media.fields";
     public static final String ALL_MEDIA_FIELDS =
-            "non_public_metrics,organic_metrics,duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
+            "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
     public static final String SPACE_FIELDS = "space.fields";
     public static final String
             ALL_SPACE_FIELDS =
@@ -1436,6 +1438,48 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
 
     /*----------------------------------------------------------------------------------------------------------------*/
+
+    @Override
+    public Tweet postTweetV1(final String text) {
+        return postTweetV1(TweetParameters.builder().status(text).build());
+    }
+
+    @SneakyThrows
+    @Override
+    public Tweet postTweetV1(final TweetParameters tweetParameters) {
+        String url = getUrlHelper().getPostTweetUrlV1();
+        if(StringUtils.isNotBlank(tweetParameters.getStatus())){
+            url = url + "?status=" + tweetParameters.getStatus();
+        }
+        String body = JsonHelper.toJson(tweetParameters);
+        Map<String, String> oauthParams = buildOauthParams(url);
+        Map<String, String> headers  = new HashMap<>();
+        headers.put("Authorization", buildHeader(oauthParams));
+        return getRequestHelperV1().makeRequest(Verb.POST, url, headers, null, body, true, TweetV1.class).orElseThrow(NoSuchElementException::new);
+    }
+
+    private Map<String, String> buildOauthParams(String url) {
+        Map<String, String> params = new HashMap<>(12);
+        params.put("oauth_consumer_key", twitterCredentials.getApiKey());
+        params.put("oauth_nonce", GlobalAuthUtils.generateNonce(32));
+        params.put("oauth_signature_method", "HMAC-SHA1");
+        params.put("oauth_timestamp", GlobalAuthUtils.getTimestamp());
+        params.put("oauth_token", twitterCredentials.getAccessToken());
+        params.put("oauth_version", "1.0");
+        params.put("oauth_signature", GlobalAuthUtils.generateTwitterSignature(params, "POST", url, twitterCredentials.getApiSecretKey(), twitterCredentials.getAccessTokenSecret()));
+        return params;
+    }
+
+    private String buildHeader(Map<String, String> oauthParams) {
+        final StringBuilder sb = new StringBuilder("OAuth" + " ");
+
+        for (Map.Entry<String, String> param : oauthParams.entrySet()) {
+            sb.append(param.getKey()).append("=\"").append(GlobalAuthUtils.urlEncode(param.getValue())).append('"').append(", ");
+        }
+
+        return sb.deleteCharAt(sb.length() - 2).toString();
+    }
+
 
     public static final String
             ALL_EXPANSIONS_NON =

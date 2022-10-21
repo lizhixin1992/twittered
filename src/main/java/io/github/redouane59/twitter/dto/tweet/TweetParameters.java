@@ -62,5 +62,8 @@ public class TweetParameters {
 
   }
 
-
+  /**
+   * v1.1
+   */
+  private String status;
 }
