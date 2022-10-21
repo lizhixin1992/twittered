@@ -86,6 +86,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -1448,14 +1449,17 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     @Override
     public Tweet postTweetV1(final TweetParameters tweetParameters) {
         String url = getUrlHelper().getPostTweetUrlV1();
+        Map<String, String> parameters = new HashMap<>(2);
         if(StringUtils.isNotBlank(tweetParameters.getStatus())){
-            url = url + "?status=" + tweetParameters.getStatus();
+            parameters.put("status", tweetParameters.getStatus());
         }
-        String body = JsonHelper.toJson(tweetParameters);
+        if(Objects.nonNull(tweetParameters.getMedia()) && !tweetParameters.getMedia().getMediaIds().isEmpty()){
+            parameters.put("media_ids", String.join(",", tweetParameters.getMedia().getMediaIds()));
+        }
         Map<String, String> oauthParams = buildOauthParams(url);
         Map<String, String> headers  = new HashMap<>();
         headers.put("Authorization", buildHeader(oauthParams));
-        return getRequestHelperV1().makeRequest(Verb.POST, url, headers, null, body, true, TweetV1.class).orElseThrow(NoSuchElementException::new);
+        return getRequestHelperV1().makeRequest(Verb.POST, url, headers, parameters, null, true, TweetV1.class).orElseThrow(NoSuchElementException::new);
     }
 
     private Map<String, String> buildOauthParams(String url) {
