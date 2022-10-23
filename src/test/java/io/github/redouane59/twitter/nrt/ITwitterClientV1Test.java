@@ -13,6 +13,7 @@ import io.github.redouane59.twitter.dto.others.RequestToken;
 import io.github.redouane59.twitter.dto.tweet.Tweet;
 import io.github.redouane59.twitter.helpers.ConverterHelper;
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -129,6 +130,16 @@ public class ITwitterClientV1Test {
     DmEvent result = twitterClient.postDm("Hello world !", "1120050519182016513");
     assertNotNull(result);
     assertNotNull(result.getEvent().getText());
+  }
+
+  @Test
+  public void testMetrics(){
+    twitterClient.getTweetNON("1583294518388224000");
+  }
+
+  @Test
+  public void testPostTweetV1(){
+    twitterClient.postTweetV1("jshdhshduwewewe");
   }
 
 }
