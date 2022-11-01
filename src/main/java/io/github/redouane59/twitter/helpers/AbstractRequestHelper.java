@@ -1,15 +1,18 @@
 package io.github.redouane59.twitter.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.scribejava.apis.TwitterApi;
 import com.github.scribejava.core.builder.ServiceBuilder;
 import com.github.scribejava.core.model.OAuthRequest;
 import com.github.scribejava.core.model.Response;
 import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth10aService;
+import io.github.redouane59.twitter.TwitterClient;
 import io.github.redouane59.twitter.signature.TwitterCredentials;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 import javax.naming.LimitExceededException;
@@ -83,13 +86,15 @@ public abstract class AbstractRequestHelper {
       String stringResponse = response.getBody();
       if (response.getCode() == 429) {
         if (!automaticRetry) {
-          throw new LimitExceededException();
+          throw new LimitExceededException(response.getHeader("x-rate-limit-reset"));
         }
         int    retryAfter    = DEFAULT_RETRY_AFTER_SEC;
         String retryAfterStr = response.getHeader("x-rate-limit-reset");
         if (retryAfterStr != null) {
           try {
-            retryAfter = Integer.parseInt(retryAfterStr);
+            long resetTime   = Long.parseLong(retryAfterStr);
+            long currentTime = (new Date().getTime()) / 1000;
+            retryAfter = Math.toIntExact(resetTime - currentTime);
           } catch (NumberFormatException e) {
             LOGGER.error("Using default retry after because header format is invalid: {}", retryAfterStr, e);
           }
@@ -102,11 +107,19 @@ public abstract class AbstractRequestHelper {
         logApiError(request.getVerb().name(), request.getUrl(), stringResponse, response.getCode());
       }
       LOGGER.info("stringResponse : {}", stringResponse);
-      result = JsonHelper.fromJson(stringResponse, classType);
+      result = convert(stringResponse, classType);
     } catch (IOException ex) {
       LOGGER.error("Error occupied on executing request", ex);
     }
     return Optional.ofNullable(result);
+  }
+
+  protected <T> T convert(String json, Class<? extends T> targetClass) throws JsonProcessingException {
+    if (targetClass.isInstance(json)) {
+      return (T) json;
+    } else {
+      return JsonHelper.fromJson(json, targetClass);
+    }
   }
 
   public abstract <T> Optional<T> getRequest(String url, Class<T> classType);
