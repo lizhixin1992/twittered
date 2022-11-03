@@ -157,13 +157,13 @@
       <version>3.12.0</version>
     </dependency>
   </dependencies>
-  <description>Java Client for the Twitter API (forked from https://github.com/redouane59/twittered)</description>
+  <description>Java Client for the Twitter API</description>
   <developers>
     <developer>
-      <email>lzx920911@gmail.com</email>
-      <name>lzx</name>
-      <organization>lizhixin1992</organization>
-      <organizationUrl>https://github.com/lizhixin1992</organizationUrl>
+      <email>bali.redouane@gmail.com</email>
+      <name>Redouane Bali</name>
+      <organization>Redouane59</organization>
+      <organizationUrl>https://github.com/Redouane59</organizationUrl>
     </developer>
   </developers>
   <distributionManagement>
@@ -172,7 +172,7 @@
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
     </snapshotRepository>
   </distributionManagement>
-  <groupId>io.github.lizhixin1992.twitter</groupId>
+  <groupId>io.github.redouane59.twitter</groupId>
 
   <licenses>
     <license>
@@ -197,18 +197,18 @@
     </sonar.coverage.jacoco.xmlReportPaths>
     <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     <sonar.login>4a9a081c5fcd7861bf9fc84032a4bc9de08ae733</sonar.login>
-    <sonar.organization>lizhixin1992</sonar.organization>
-    <sonar.projectKey>lizhixin1992_twittered</sonar.projectKey>
+    <sonar.organization>redouane59</sonar.organization>
+    <sonar.projectKey>redouane59_twittered</sonar.projectKey>
   </properties>
 
   <scm>
-    <connection>scm:git:git://github.com/lizhixin1992/twittered.git</connection>
-    <developerConnection>scm:git:ssh://github.com:lizhixin1992/twittered.git
+    <connection>scm:git:git://github.com/Redouane59/twittered.git</connection>
+    <developerConnection>scm:git:ssh://github.com:Redouane59/twittered.git
     </developerConnection>
-    <url>https://github.com/lizhixin1992/twittered</url>
+    <url>https://github.com/Redouane59/twittered</url>
   </scm>
 
-  <url>https://github.com/lizhixin1992/twittered</url>
+  <url>https://github.com/Redouane59/twittered</url>
 
   <version>2.20</version>
 </project>
