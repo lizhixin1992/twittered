@@ -4,82 +4,82 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <artifactId>twittered</artifactId>
 
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>jacoco-maven-plugin</artifactId>
-        <configuration>
-          <append>true</append>
-          <excludes>
-            <exclude>target/**</exclude>
-          </excludes>
-          <output>file</output>
-          <skip>${maven.test.skip}</skip>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-            <id>jacoco-initialize</id>
-          </execution>
-          <execution>
-            <goals>
-              <goal>report</goal>
-            </goals>
-            <id>jacoco-site</id>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-        <groupId>org.jacoco</groupId>
-        <version>0.8.6</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.0.0-M4</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar-no-fork</goal>
-            </goals>
-            <id>attach-sources</id>
-          </execution>
-        </executions>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>2.2.1</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <source>8</source>
-        </configuration>
-        <executions>
-          <execution>
-            <configuration>
-              <failOnError>false</failOnError>
-            </configuration>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-            <id>attach-javadocs</id>
-          </execution>
-        </executions>
-        <groupId>org.apache.maven.plugins</groupId>
-        <version>3.2.0</version>
-      </plugin>
-    </plugins>
-  </build>
+<!--  <build>-->
+<!--    <plugins>-->
+<!--      <plugin>-->
+<!--        <artifactId>jacoco-maven-plugin</artifactId>-->
+<!--        <configuration>-->
+<!--          <append>true</append>-->
+<!--          <excludes>-->
+<!--            <exclude>target/**</exclude>-->
+<!--          </excludes>-->
+<!--          <output>file</output>-->
+<!--          <skip>${maven.test.skip}</skip>-->
+<!--        </configuration>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>prepare-agent</goal>-->
+<!--            </goals>-->
+<!--            <id>jacoco-initialize</id>-->
+<!--          </execution>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>report</goal>-->
+<!--            </goals>-->
+<!--            <id>jacoco-site</id>-->
+<!--            <phase>verify</phase>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <groupId>org.jacoco</groupId>-->
+<!--        <version>0.8.6</version>-->
+<!--      </plugin>-->
+<!--      <plugin>-->
+<!--        <artifactId>maven-surefire-plugin</artifactId>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <version>3.0.0-M4</version>-->
+<!--      </plugin>-->
+<!--      <plugin>-->
+<!--        <artifactId>maven-source-plugin</artifactId>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <goals>-->
+<!--              <goal>jar-no-fork</goal>-->
+<!--            </goals>-->
+<!--            <id>attach-sources</id>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <version>2.2.1</version>-->
+<!--      </plugin>-->
+<!--      <plugin>-->
+<!--        <artifactId>maven-javadoc-plugin</artifactId>-->
+<!--        <configuration>-->
+<!--          <source>8</source>-->
+<!--        </configuration>-->
+<!--        <executions>-->
+<!--          <execution>-->
+<!--            <configuration>-->
+<!--              <failOnError>false</failOnError>-->
+<!--            </configuration>-->
+<!--            <goals>-->
+<!--              <goal>jar</goal>-->
+<!--            </goals>-->
+<!--            <id>attach-javadocs</id>-->
+<!--          </execution>-->
+<!--        </executions>-->
+<!--        <groupId>org.apache.maven.plugins</groupId>-->
+<!--        <version>3.2.0</version>-->
+<!--      </plugin>-->
+<!--    </plugins>-->
+<!--  </build>-->
   <dependencies>
-    <dependency>
-      <artifactId>sonar-packaging-maven-plugin</artifactId>
-      <groupId>org.codehaus.sonar</groupId>
-      <type>maven-plugin</type>
-      <version>1.13</version>
-    </dependency>
+<!--    <dependency>-->
+<!--      <artifactId>sonar-packaging-maven-plugin</artifactId>-->
+<!--      <groupId>org.codehaus.sonar</groupId>-->
+<!--      <type>maven-plugin</type>-->
+<!--      <version>1.13</version>-->
+<!--    </dependency>-->
     <dependency>
       <artifactId>jackson-databind</artifactId>
       <groupId>com.fasterxml.jackson.core</groupId>
@@ -144,7 +144,7 @@
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
-      <version>1.2.80</version>
+      <version>1.2.83</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
@@ -157,7 +157,9 @@
       <version>3.12.0</version>
     </dependency>
   </dependencies>
+
   <description>Java Client for the Twitter API</description>
+
   <developers>
     <developer>
       <email>lzx920911@gmail.com</email>
@@ -166,16 +168,16 @@
       <organizationUrl>https://github.com/lizhixin1992</organizationUrl>
     </developer>
   </developers>
-  <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://s01.oss.sonatype.orgservice/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
+<!--  <distributionManagement>-->
+<!--    <snapshotRepository>-->
+<!--      <id>ossrh</id>-->
+<!--      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>-->
+<!--    </snapshotRepository>-->
+<!--    <repository>-->
+<!--      <id>ossrh</id>-->
+<!--      <url>https://s01.oss.sonatype.orgservice/local/staging/deploy/maven2/</url>-->
+<!--    </repository>-->
+<!--  </distributionManagement>-->
   <groupId>io.github.lizhixin1992.twittered</groupId>
 
   <licenses>
@@ -187,23 +189,113 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>twittered</name>
+  <name>twitter</name>
 
   <properties>
-    <appengine-maven-plugin-version>1.3.2</appengine-maven-plugin-version>
-    <appengine.app.version>1</appengine.app.version>
-    <appengine.target.version>1.9.71</appengine.target.version>
+<!--    <appengine-maven-plugin-version>1.3.2</appengine-maven-plugin-version>-->
+<!--    <appengine.app.version>1</appengine.app.version>-->
+<!--    <appengine.target.version>1.9.71</appengine.target.version>-->
     <java.version>1.8</java.version>
     <maven.compiler.source>8</maven.compiler.source>
     <maven.compiler.target>8</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml
-    </sonar.coverage.jacoco.xmlReportPaths>
-    <sonar.host.url>https://sonarcloud.io</sonar.host.url>
-    <sonar.login>4a9a081c5fcd7861bf9fc84032a4bc9de08ae733</sonar.login>
-    <sonar.organization>lizhixin1992</sonar.organization>
-    <sonar.projectKey>lizhixin1992_twittered</sonar.projectKey>
+<!--    <sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml-->
+<!--    </sonar.coverage.jacoco.xmlReportPaths>-->
+<!--    <sonar.host.url>https://sonarcloud.io</sonar.host.url>-->
+<!--    <sonar.login>4a9a081c5fcd7861bf9fc84032a4bc9de08ae733</sonar.login>-->
+<!--    <sonar.organization>lizhixin1992</sonar.organization>-->
+<!--    <sonar.projectKey>lizhixin1992_twittered</sonar.projectKey>-->
   </properties>
+
+  <build>
+    <plugins>
+      <!-- 编译插件 -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>${maven.compiler.source}</source>
+          <target>${maven.compiler.target}</target>
+        </configuration>
+      </plugin>
+
+      <!-- Javadoc -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.1.1</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>release</id>
+      <distributionManagement>
+        <snapshotRepository>
+          <id>ossrh</id>
+          <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+          <id>ossrh</id>
+          <url>https://s01.oss.sonatype.orgservice/local/staging/deploy/maven2/</url>
+        </repository>
+      </distributionManagement>
+      <build>
+        <plugins>
+          <!-- Source -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.2.1</version>
+            <executions>
+              <execution>
+                <id>ossrh</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- Gpg Signature -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.6</version>
+            <executions>
+              <execution>
+                <id>ossrh</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.6.7</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>ossrh</serverId>
+              <nexusUrl>https://s01.oss.sonatype.org</nexusUrl>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <scm>
     <connection>scm:git:git://github.com/lizhixin1992/twittered.git</connection>
