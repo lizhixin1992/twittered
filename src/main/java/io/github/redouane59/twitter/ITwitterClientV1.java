@@ -4,8 +4,8 @@ import io.github.redouane59.RelationType;
 import io.github.redouane59.twitter.dto.collections.CollectionsResponse;
 import io.github.redouane59.twitter.dto.collections.CollectionsResponse.Response.Position;
 import io.github.redouane59.twitter.dto.collections.TimeLineOrder;
-import io.github.redouane59.twitter.dto.dm.DirectMessage;
-import io.github.redouane59.twitter.dto.dm.DmEvent;
+import io.github.redouane59.twitter.dto.dm.deprecatedV1.DirectMessage;
+import io.github.redouane59.twitter.dto.dm.deprecatedV1.DmEvent;
 import io.github.redouane59.twitter.dto.others.RateLimitStatus;
 import io.github.redouane59.twitter.dto.others.RequestToken;
 import io.github.redouane59.twitter.dto.tweet.MediaCategory;
@@ -162,6 +162,7 @@ public interface ITwitterClientV1 {
    * Returns all Direct Message events (both sent and received) within the last 30 days. Sorted in reverse-chronological order. Calling
    * https://api.twitter.com/1.1/direct_messages/events/list.json
    */
+  @Deprecated
   List<DirectMessage> getDmList();
 
   /**
@@ -170,6 +171,7 @@ public interface ITwitterClientV1 {
    *
    * @param count Number of direct messages to be returned
    */
+  @Deprecated
   List<DirectMessage> getDmList(int count);
 
   /**
@@ -177,6 +179,7 @@ public interface ITwitterClientV1 {
    *
    * @param dmId The id of the Direct Message event that should be returned.
    */
+  @Deprecated
   DirectMessage getDm(String dmId);
 
   /**
@@ -185,6 +188,7 @@ public interface ITwitterClientV1 {
    * @param text defining the content to deliver to the reciepient
    * @param userId The ID of the user who should receive the direct message.
    */
+  @Deprecated
   DmEvent postDm(String text, String userId);
 
   /**

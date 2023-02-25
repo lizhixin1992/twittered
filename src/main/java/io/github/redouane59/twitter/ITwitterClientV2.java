@@ -1,6 +1,10 @@
 package io.github.redouane59.twitter;
 
 import com.github.scribejava.core.model.Response;
+import io.github.redouane59.twitter.dto.dm.DirectMessage;
+import io.github.redouane59.twitter.dto.dm.DmParameters;
+import io.github.redouane59.twitter.dto.dm.DmParameters.DmMessage;
+import io.github.redouane59.twitter.dto.dm.PostDmResponse;
 import io.github.redouane59.twitter.dto.endpoints.AdditionalParameters;
 import io.github.redouane59.twitter.dto.list.TwitterList;
 import io.github.redouane59.twitter.dto.list.TwitterListList;
@@ -174,10 +178,10 @@ public interface ITwitterClientV2 {
   Future<Response> startFilteredStream(IAPIEventListener listener, int backfillMinutes);
 
   /**
-   * Stops the filtered stream with the result of the startFilteredStream. It'll wait a maximum of timeout
-   * before giving up and returning false.  If timeout isn't hit, it'll close the socket opened.
+   * Stops the filtered stream with the result of the startFilteredStream. It'll wait a maximum of timeout before giving up and returning false.  If
+   * timeout isn't hit, it'll close the socket opened.
    *
-   * @param responseFuture Future<Response> given by startFilteredStream
+   * @param response Future<Response> given by startFilteredStream
    * @param timeout long How long to wait
    * @param unit TimeUnit Units for timeout
    */
@@ -186,7 +190,7 @@ public interface ITwitterClientV2 {
   /**
    * Stops the filtered stream with the result of the startFilteredStream. It'll close the socket opened.
    *
-   * @param responseFuture Future<Response> given by startFilteredStream
+   * @param response Future<Response> given by startFilteredStream
    */
   boolean stopFilteredStream(Future<Response> response);
 
@@ -651,6 +655,77 @@ public interface ITwitterClientV2 {
    */
   boolean deleteTweet(String tweetId);
 
+  /**
+   * Returns a list of Direct Messages for the authenticated user, both sent and received calling https://api.twitter.com/2/dm_events. Direct Message
+   * events are returned in reverse chronological order. Supports retrieving events from the previous 30 days.
+   */
+  DirectMessage getDirectMessageEvents();
+
+  /**
+   * Returns a list of Direct Messages for the authenticated user, both sent and received calling https://api.twitter.com/2/dm_events. Direct Message
+   * events are returned in reverse chronological order. Supports retrieving events from the previous 30 days.
+   */
+  DirectMessage getDirectMessageEvents(AdditionalParameters additionalParameters);
+
+  /**
+   * Returns a list of Direct Messages within a conversation specified in the dm_conversation_id path parameter calling
+   * https://api.twitter.com/2/dm_conversations/:dm_conversation_id/dm_events. Messages are returned in reverse chronological order.
+   */
+  DirectMessage getDirectMessagesByConversation(String conversationId);
+
+  /**
+   * Returns a list of Direct Messages within a conversation specified in the dm_conversation_id path parameter calling
+   * https://api.twitter.com/2/dm_conversations/:dm_conversation_id/dm_events. Messages are returned in reverse chronological order.
+   */
+  DirectMessage getDirectMessagesByConversation(String conversationId, AdditionalParameters additionalParameters);
+
+  /**
+   * Returns a list of Direct Messages (DM) events within a 1-1 conversation with the user specified in the participant_id path parameter calling
+   * https://api.twitter.com/2/dm_conversations/with/:participant_id/dm_events. Messages are returned in reverse chronological order.
+   */
+  DirectMessage getDirectMessagesByUser(String participantId);
+
+  /**
+   * Returns a list of Direct Messages (DM) events within a 1-1 conversation with the user specified in the participant_id path parameter calling
+   * https://api.twitter.com/2/dm_conversations/with/:participant_id/dm_events. Messages are returned in reverse chronological order.
+   */
+  DirectMessage getDirectMessagesByUser(String participantId, AdditionalParameters additionalParameters);
+
+  /**
+   * Creates a Direct Message on behalf of an authenticated user, and adds it to the specified conversation calling
+   * https://api.twitter.com/2/dm_conversations/:dm_conversation_id/messages.
+   */
+  PostDmResponse createDirectMessage(String conversationId, String text);
+
+  /**
+   * Creates a Direct Message on behalf of an authenticated user, and adds it to the specified conversation calling
+   * https://api.twitter.com/2/dm_conversations/:dm_conversation_id/messages.
+   */
+  PostDmResponse createDirectMessage(String conversationId, DmMessage message);
+
+  /**
+   * Creates a new group conversation and adds a Direct Message to it on behalf of an authenticated user calling
+   * https://api.twitter.com/2/dm_conversations
+   */
+  PostDmResponse createGroupDmConversation(DmParameters parameters);
+
+  /**
+   * Creates a new group conversation and adds a Direct Message to it on behalf of an authenticated user calling
+   * https://api.twitter.com/2/dm_conversations
+   */
+  PostDmResponse createGroupDmConversation(List<String> participantIds, String text);
+
+  /**
+   * Creates a one-to-one Direct Message and adds it to the one-to-one conversation. This method either creates a new one-to-one conversation or
+   * retrieves the current conversation and adds the Direct Message to it calling https://api.twitter.com/2/dm_conversations/with/:participant_id/messages.
+   */
+  PostDmResponse createUserDmConversation(String participantId, String text);
+
+  /**
+   * Creates a one-to-one Direct Message and adds it to the one-to-one conversation. This method either creates a new one-to-one conversation or
+   * retrieves the current conversation and adds the Direct Message to it calling https://api.twitter.com/2/dm_conversations/with/:participant_id/messages.
+   */
+  PostDmResponse createUserDmConversation(String participantId, DmMessage message);
 
   /**
    * Get a tweet from its id calling https://api.twitter.com/2/tweets
