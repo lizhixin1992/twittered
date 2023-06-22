@@ -265,6 +265,13 @@ public class TweetV2 implements Tweet {
     @JsonProperty("public_metrics")
     @JsonInclude(Include.NON_NULL)
     private TweetPublicMetricsDTO    publicMetrics;
+    @JsonProperty("organic_metrics")
+    @JsonInclude(Include.NON_NULL)
+    private TweetOrganicMetricsDTO    organicMetrics;
+    @JsonProperty("non_public_metrics")
+    @JsonInclude(Include.NON_NULL)
+    private TweetNonPublicMetricsDTO    nonPublicMetrics;
+    @JsonInclude(Include.NON_NULL)
     @JsonProperty("possibly_sensitive")
     private boolean                  possiblySensitive;
     private String                   lang;
@@ -402,6 +409,34 @@ public class TweetV2 implements Tweet {
     private int likeCount;
     @JsonProperty("quote_count")
     private int quoteCount;
+    @JsonProperty("bookmark_count")
+    private int bookmarkCount;
+    @JsonProperty("impression_count")
+    private int impressionCount;
+  }
+  @Getter
+  @Setter
+  public static class TweetOrganicMetricsDTO {
+
+    @JsonProperty("retweet_count")
+    private int retweetCount;
+    @JsonProperty("reply_count")
+    private int replyCount;
+    @JsonProperty("like_count")
+    private int likeCount;
+    @JsonProperty("user_profile_clicks")
+    private int userProfileClicks;
+    @JsonProperty("impression_count")
+    private int impressionCount;
+  }
+  @Getter
+  @Setter
+  public static class TweetNonPublicMetricsDTO {
+
+    @JsonProperty("user_profile_clicks")
+    private int userProfileClicks;
+    @JsonProperty("impression_count")
+    private int impressionCount;
   }
 
   @Getter

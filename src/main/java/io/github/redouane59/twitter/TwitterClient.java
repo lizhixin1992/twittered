@@ -68,6 +68,7 @@ import io.github.redouane59.twitter.helpers.RequestHelper;
 import io.github.redouane59.twitter.helpers.RequestHelperV2;
 import io.github.redouane59.twitter.helpers.URLHelper;
 import io.github.redouane59.twitter.signature.TwitterCredentials;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
@@ -106,61 +107,61 @@ import org.apache.commons.lang3.StringUtils;
 @Slf4j
 public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitterClientArchive {
 
-  public static final String TWEET_FIELDS     = "tweet.fields";
-  public static final String
-                             ALL_TWEET_FIELDS =
-      "attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
-  public static final String EXPANSION        = "expansions";
-  public static final String
-                             ALL_EXPANSIONS   =
-      "author_id,entities.mentions.username,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,attachments.media_keys,geo.place_id";
-  public static final String USER_FIELDS      = "user.fields";
-  public static final String ALL_USER_FIELDS  =
-      "id,created_at,entities,username,name,location,url,verified,profile_image_url,public_metrics,pinned_tweet_id,description,protected";
-  public static final String MEDIA_FIELD      = "media.fields";
-  public static final String ALL_MEDIA_FIELDS =
-      "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
-  public static final String SPACE_FIELDS     = "space.fields";
-  public static final String
-                             ALL_SPACE_FIELDS =
-      "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed";
-  public static final String PLACE_FIELDS     = "place.fields";
-  public static final String ALL_PLACE_FIELDS = "contained_within,country,country_code,full_name,geo,id,name,place_type";
-  public static final String POLL_FIELDS      = "poll.fields";
-  public static final String ALL_POLL_FIELDS  = "duration_minutes,end_datetime,id,options,voting_status";
-  public static final String LIST_FIELDS      = "list.fields";
-  public static final String
-                             ALL_LIST_FIELDS  = "created_at,follower_count,member_count,private,description,owner_id";
+    public static final String TWEET_FIELDS = "tweet.fields";
+    public static final String
+            ALL_TWEET_FIELDS =
+            "attachments,author_id,created_at,entities,geo,id,in_reply_to_user_id,lang,possibly_sensitive,public_metrics,referenced_tweets,source,text,withheld,context_annotations,conversation_id,reply_settings";
+    public static final String EXPANSION = "expansions";
+    public static final String
+            ALL_EXPANSIONS =
+            "author_id,entities.mentions.username,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id,attachments.media_keys,geo.place_id";
+    public static final String USER_FIELDS = "user.fields";
+    public static final String ALL_USER_FIELDS =
+            "id,created_at,entities,username,name,location,url,verified,profile_image_url,public_metrics,pinned_tweet_id,description,protected";
+    public static final String MEDIA_FIELD = "media.fields";
+    public static final String ALL_MEDIA_FIELDS =
+            "duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
+    public static final String SPACE_FIELDS = "space.fields";
+    public static final String
+            ALL_SPACE_FIELDS =
+            "host_ids,created_at,creator_id,id,lang,invited_user_ids,participant_count,speaker_ids,started_at,state,title,updated_at,scheduled_start,is_ticketed";
+    public static final String PLACE_FIELDS = "place.fields";
+    public static final String ALL_PLACE_FIELDS = "contained_within,country,country_code,full_name,geo,id,name,place_type";
+    public static final String POLL_FIELDS = "poll.fields";
+    public static final String ALL_POLL_FIELDS = "duration_minutes,end_datetime,id,options,voting_status";
+    public static final String LIST_FIELDS = "list.fields";
+    public static final String
+            ALL_LIST_FIELDS = "created_at,follower_count,member_count,private,description,owner_id";
 
-  public static final  String             ALL_SPACE_EXPANSIONS                 = "invited_user_ids,speaker_ids,creator_id,host_ids";
-  public static final  String             DM_FIELDS                            = "dm_event.fields";
-  public static final  String
-                                          ALL_DM_FIELDS                        =
-      "id,text,event_type,created_at,dm_conversation_id,sender_id,participant_ids,referenced_tweets,attachments";
-  private static final String
-                                          ALL_DM_EXPANSIONS                    =
-      "attachments.media_keys,referenced_tweets.id,sender_id,participant_ids";
-  private static final String             QUERY                                = "query";
-  private static final String             CURSOR                               = "cursor";
-  private static final String             NEXT                                 = "next";
-  private static final String             PAGINATION_TOKEN                     = "pagination_token";
-  private static final String             PINNED_TWEET_ID                      = "pinned_tweet_id";
-  private static final String             BACKFILL_MINUTES                     = "backfill_minutes";
-  private static final String             DATA                                 = "data";
-  private static final String             DELETED                              = "deleted";
-  private static final String             IS_MEMBER                            = "is_member";
-  private static final String             FOLLOWING                            = "following";
-  private static final String             PINNED                               = "pinned";
-  private static final String[]           DEFAULT_VALID_CREDENTIALS_FILE_NAMES = {"test-twitter-credentials.json",
-                                                                                  "twitter-credentials.json"};
-  private              URLHelper          urlHelper                            = new URLHelper();
-  private              RequestHelper      requestHelperV1;
-  private              RequestHelperV2    requestHelperV2;
-  private              TwitterCredentials twitterCredentials;
+    public static final String ALL_SPACE_EXPANSIONS = "invited_user_ids,speaker_ids,creator_id,host_ids";
+    public static final String DM_FIELDS = "dm_event.fields";
+    public static final String
+            ALL_DM_FIELDS =
+            "id,text,event_type,created_at,dm_conversation_id,sender_id,participant_ids,referenced_tweets,attachments";
+    private static final String
+            ALL_DM_EXPANSIONS =
+            "attachments.media_keys,referenced_tweets.id,sender_id,participant_ids";
+    private static final String QUERY = "query";
+    private static final String CURSOR = "cursor";
+    private static final String NEXT = "next";
+    private static final String PAGINATION_TOKEN = "pagination_token";
+    private static final String PINNED_TWEET_ID = "pinned_tweet_id";
+    private static final String BACKFILL_MINUTES = "backfill_minutes";
+    private static final String DATA = "data";
+    private static final String DELETED = "deleted";
+    private static final String IS_MEMBER = "is_member";
+    private static final String FOLLOWING = "following";
+    private static final String PINNED = "pinned";
+    private static final String[] DEFAULT_VALID_CREDENTIALS_FILE_NAMES = {"test-twitter-credentials.json",
+            "twitter-credentials.json"};
+    private URLHelper urlHelper = new URLHelper();
+    private RequestHelper requestHelperV1;
+    private RequestHelperV2 requestHelperV2;
+    private TwitterCredentials twitterCredentials;
 
-  public TwitterClient() {
-    this(getAuthentication());
-  }
+    public TwitterClient() {
+        this(getAuthentication());
+    }
 
     public TwitterClient(TwitterCredentials credentials) {
         this(credentials, new ServiceBuilder(credentials.getApiKey()).apiSecret(credentials.getApiSecretKey()));
@@ -183,8 +184,8 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     public TwitterClient(TwitterCredentials credentials, OAuth10aService service) {
         twitterCredentials = credentials;
-        requestHelperV1    = new RequestHelper(credentials, service);
-        requestHelperV2    = new RequestHelperV2(credentials, service);
+        requestHelperV1 = new RequestHelper(credentials, service);
+        requestHelperV2 = new RequestHelperV2(credentials, service);
     }
 
     public static TwitterCredentials getAuthentication() {
@@ -249,10 +250,10 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     // can manage up to 5000 results / call . Max 15 calls / 15min ==> 75.000
     // results max. / 15min
     private List<String> getUserIdsByRelation(String url) {
-        String       cursor = "-1";
+        String cursor = "-1";
         List<String> result = new ArrayList<>();
         do {
-            String           urlWithCursor  = url + "&" + CURSOR + "=" + cursor;
+            String urlWithCursor = url + "&" + CURSOR + "=" + cursor;
             Optional<IdList> idListResponse = getRequestHelper().getRequest(urlWithCursor, IdList.class);
             if (!idListResponse.isPresent()) {
                 break;
@@ -270,7 +271,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getFollowers(final String userId, final AdditionalParameters additionalParameters) {
-        String              url        = urlHelper.getFollowersUrl(userId);
+        String url = urlHelper.getFollowersUrl(userId);
         Map<String, String> parameters = additionalParameters.getMapFromParameters();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         if (!additionalParameters.isRecursiveCall()) {
@@ -289,7 +290,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getFollowing(final String userId, final AdditionalParameters additionalParameters) {
-        String              url        = urlHelper.getFollowingUrl(userId);
+        String url = urlHelper.getFollowingUrl(userId);
         Map<String, String> parameters = additionalParameters.getMapFromParameters();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         if (!additionalParameters.isRecursiveCall()) {
@@ -307,7 +308,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
         RelationshipObjectResponse relationshipDTO = getRequestHelper().getRequest(url, RelationshipObjectResponse.class)
                 .orElseThrow(NoSuchElementException::new);
         boolean followedBy = relationshipDTO.getRelationship().getSource().isFollowedBy();
-        boolean following  = relationshipDTO.getRelationship().getSource().isFollowing();
+        boolean following = relationshipDTO.getRelationship().getSource().isFollowing();
         if (followedBy && following) {
             return RelationType.FRIENDS;
         } else if (!followedBy && !following) {
@@ -334,7 +335,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     @SneakyThrows
     @Override
     public UserActionResponse follow(String targetUserId) {
-        String url  = urlHelper.getFollowUrl(getUserIdFromAccessToken());
+        String url = urlHelper.getFollowUrl(getUserIdFromAccessToken());
         String body = JsonHelper.toJson(new FollowBody(targetUserId));
         return requestHelperV1.postRequestWithBodyJson(url, new HashMap<>(), body, UserActionResponse.class)
                 .orElseThrow(NoSuchElementException::new);
@@ -371,7 +372,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getBlockedUsers() {
-        String              url        = urlHelper.getBlockingUsersUrl(getUserIdFromAccessToken());
+        String url = urlHelper.getBlockingUsersUrl(getUserIdFromAccessToken());
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         return getRequestHelper().getRequestWithParameters(url, parameters, UserList.class).orElseThrow(NoSuchElementException::new);
@@ -379,7 +380,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public User getUserFromUserId(String userId) {
-        String              url        = getUrlHelper().getUserUrl(userId);
+        String url = getUrlHelper().getUserUrl(userId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(EXPANSION, PINNED_TWEET_ID);
@@ -388,7 +389,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserV2 getUserFromUserName(String userName) {
-        String              url        = getUrlHelper().getUserUrlFromName(userName);
+        String url = getUrlHelper().getUserUrlFromName(userName);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(EXPANSION, PINNED_TWEET_ID);
@@ -397,12 +398,12 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public List<User> getUsersFromUserNames(List<String> userNames) {
-        String              url        = getUrlHelper().getUsersByUrl();
+        String url = getUrlHelper().getUsersByUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(EXPANSION, PINNED_TWEET_ID);
         StringBuilder names = new StringBuilder();
-        int           i     = 0;
+        int i = 0;
         while (i < userNames.size() && i < URLHelper.MAX_LOOKUP) {
             String name = userNames.get(i);
             names.append(name);
@@ -418,12 +419,12 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public List<User> getUsersFromUserIds(List<String> userIds) {
-        String              url        = getUrlHelper().getUsersUrl();
+        String url = getUrlHelper().getUsersUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(EXPANSION, PINNED_TWEET_ID);
         StringBuilder names = new StringBuilder();
-        int           i     = 0;
+        int i = 0;
         while (i < userIds.size() && i < URLHelper.MAX_LOOKUP) {
             String name = userIds.get(i);
             names.append(name);
@@ -460,7 +461,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getRetweetingUsers(String tweetId, int maxResults) {
-        String              url        = urlHelper.getRetweetersUrl(tweetId);
+        String url = urlHelper.getRetweetersUrl(tweetId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(EXPANSION, PINNED_TWEET_ID);
@@ -474,7 +475,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
      */
     private UserList getUsersRecursively(int maxResults, String url, Map<String, String> parameters) {
         UserList result = UserList.builder().meta(new UserMeta()).build();
-        String   next;
+        String next;
 
         do {
             parameters.put(MAX_RESULTS, String.valueOf(Math.min(100, maxResults - result.getData().size())));
@@ -505,7 +506,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getLikingUsers(final String tweetId, int maxResults) {
-        String              url        = getUrlHelper().getLikingUsersUrl(tweetId);
+        String url = getUrlHelper().getLikingUsersUrl(tweetId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(EXPANSION, PINNED_TWEET_ID);
@@ -524,7 +525,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public TweetList getLikedTweets(final String userId, AdditionalParameters additionalParameters) {
-        String              url        = getUrlHelper().getLikedTweetsUrl(userId);
+        String url = getUrlHelper().getLikedTweetsUrl(userId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
         if (!additionalParameters.isRecursiveCall()) {
@@ -567,7 +568,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     @SneakyThrows
     @Override
     public UserActionResponse muteUser(final String userId) {
-        String url  = urlHelper.getMuteUserUrl(getUserIdFromAccessToken());
+        String url = urlHelper.getMuteUserUrl(getUserIdFromAccessToken());
         String body = JsonHelper.toJson(new FollowBody(userId));
         return requestHelperV1.postRequestWithBodyJson(url, new HashMap<>(), body, UserActionResponse.class)
                 .orElseThrow(NoSuchElementException::new);
@@ -582,7 +583,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getMutedUsers() {
-        String              url        = urlHelper.getMutedUsersUrl(getUserIdFromAccessToken());
+        String url = urlHelper.getMutedUsersUrl(getUserIdFromAccessToken());
         Map<String, String> parameters = new HashMap<>();
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(EXPANSION, PINNED_TWEET_ID);
@@ -593,7 +594,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public RetweetResponse retweetTweet(String tweetId) {
-        String url  = getUrlHelper().getRetweetTweetUrl(getUserIdFromAccessToken());
+        String url = getUrlHelper().getRetweetTweetUrl(getUserIdFromAccessToken());
         String body = "{\"tweet_id\": \"" + tweetId + "\"}";
         return requestHelperV1.postRequestWithBodyJson(url, new HashMap<>(), body, RetweetResponse.class).orElseThrow(NoSuchElementException::new);
     }
@@ -607,7 +608,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public Space getSpace(final String spaceId) {
-        String              url        = getUrlHelper().getSpaceUrl(spaceId);
+        String url = getUrlHelper().getSpaceUrl(spaceId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, "invited_user_ids,speaker_ids,creator_id,host_ids");
         parameters.put(SPACE_FIELDS, ALL_SPACE_FIELDS);
@@ -617,7 +618,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public SpaceList getSpaces(final List<String> spaceIds) {
-        String              url        = getUrlHelper().getSpacesUrl();
+        String url = getUrlHelper().getSpacesUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, ALL_SPACE_EXPANSIONS);
         parameters.put(SPACE_FIELDS, ALL_SPACE_FIELDS);
@@ -639,7 +640,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public SpaceList searchSpaces(final String query, final SpaceState state) {
-        String              url        = getUrlHelper().getSearchSpacesUrl();
+        String url = getUrlHelper().getSearchSpacesUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put("query", query);
         parameters.put("state", state.getLabel());
@@ -653,7 +654,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getSpaceBuyers(final String spaceId) {
-        String              url        = getUrlHelper().getSpaceBuyersUrl(spaceId);
+        String url = getUrlHelper().getSpaceBuyersUrl(spaceId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, PINNED_TWEET_ID);
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
@@ -665,7 +666,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     @SneakyThrows
     @Override
     public TwitterList createList(final String listName, final String description, final boolean isPrivate) {
-        String          url  = getUrlHelper().getListUrlV2();
+        String url = getUrlHelper().getListUrlV2();
         TwitterListData body = TwitterListData.builder().name(listName).description(description).isPrivate(isPrivate).build();
         return getRequestHelperV1().postRequestWithBodyJson(url, null, JsonHelper.toJson(body), TwitterList.class)
                 .orElseThrow(NoSuchElementException::new);
@@ -683,7 +684,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     @SneakyThrows
     @Override
     public boolean addListMember(final String listId, final String userId) {
-        String                url  = getUrlHelper().getAddListMemberUrl(listId);
+        String url = getUrlHelper().getAddListMemberUrl(listId);
         TwitterListMemberData body = TwitterListMemberData.builder().userId(userId).build();
         JsonNode jsonNode =
                 getRequestHelperV1().postRequestWithBodyJson(url, null, JsonHelper.toJson(body), JsonNode.class)
@@ -702,7 +703,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     @SneakyThrows
     @Override
     public boolean pinList(final String listId) {
-        String url  = getUrlHelper().getPinListUrl(getUserIdFromAccessToken());
+        String url = getUrlHelper().getPinListUrl(getUserIdFromAccessToken());
         String body = "{\"list_id\": \"" + listId + "\"}";
         JsonNode jsonNode = getRequestHelperV1().postRequestWithBodyJson(url, null, body, JsonNode.class)
                 .orElseThrow(NoSuchElementException::new);
@@ -731,7 +732,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public boolean followList(final String listId) {
-        String url  = getUrlHelper().getFollowListUrl(getUserIdFromAccessToken());
+        String url = getUrlHelper().getFollowListUrl(getUserIdFromAccessToken());
         String body = "{\"list_id\": \"" + listId + "\"}";
         JsonNode jsonNode = getRequestHelperV1().postRequestWithBodyJson(url, null, body, JsonNode.class)
                 .orElseThrow(NoSuchElementException::new);
@@ -748,7 +749,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public TwitterList getList(final String listId) {
-        String              url        = getUrlHelper().getListUrlV2() + "/" + listId;
+        String url = getUrlHelper().getListUrlV2() + "/" + listId;
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, "owner_id");
         parameters.put(LIST_FIELDS, ALL_LIST_FIELDS);
@@ -758,7 +759,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public UserList getListMembers(final String listId) {
-        String              url        = getUrlHelper().getAddListMemberUrl(listId);
+        String url = getUrlHelper().getAddListMemberUrl(listId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, PINNED_TWEET_ID);
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
@@ -768,7 +769,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public TwitterListList getUserOwnedLists(final String userId) {
-        String              url        = getUrlHelper().getOwnedListUrl(userId);
+        String url = getUrlHelper().getOwnedListUrl(userId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, "owner_id");
         parameters.put(LIST_FIELDS, ALL_LIST_FIELDS);
@@ -778,7 +779,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public TweetList getListTweets(String listId, AdditionalParameters additionalParameters) {
-        String              url        = getUrlHelper().getListTweetsUrl(listId);
+        String url = getUrlHelper().getListTweetsUrl(listId);
         Map<String, String> parameters = additionalParameters.getMapFromParameters();
         parameters.put(EXPANSION, ALL_EXPANSIONS);
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
@@ -804,7 +805,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     @SneakyThrows
     @Override
     public Tweet postTweet(final TweetParameters tweetParameters) {
-        String url  = getUrlHelper().getPostTweetUrl();
+        String url = getUrlHelper().getPostTweetUrl();
         String body = JsonHelper.toJson(tweetParameters);
         return getRequestHelperV1().postRequestWithBodyJson(url, new HashMap<>(), body, TweetV2.class).orElseThrow(NoSuchElementException::new);
     }
@@ -824,7 +825,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public DirectMessage getDirectMessageEvents(final AdditionalParameters additionalParameters) {
-        String              url        = getUrlHelper().getDmEventsUrl();
+        String url = getUrlHelper().getDmEventsUrl();
         Map<String, String> parameters = additionalParameters.getMapFromParameters();
         parameters.put(DM_FIELDS, ALL_DM_FIELDS);
         parameters.put(EXPANSION, ALL_DM_EXPANSIONS);
@@ -841,7 +842,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public DirectMessage getDirectMessagesByConversation(String conversationId, final AdditionalParameters additionalParameters) {
-        String              url        = getUrlHelper().getDmLookupUrl(conversationId);
+        String url = getUrlHelper().getDmLookupUrl(conversationId);
         Map<String, String> parameters = additionalParameters.getMapFromParameters();
         parameters.put(DM_FIELDS, ALL_DM_FIELDS);
         parameters.put(EXPANSION, ALL_DM_EXPANSIONS);
@@ -858,7 +859,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public DirectMessage getDirectMessagesByUser(final String participantId, final AdditionalParameters additionalParameters) {
-        String              url        = getUrlHelper().getDmUserLookupUrl(participantId);
+        String url = getUrlHelper().getDmUserLookupUrl(participantId);
         Map<String, String> parameters = additionalParameters.getMapFromParameters();
         parameters.put(DM_FIELDS, ALL_DM_FIELDS);
         parameters.put(EXPANSION, ALL_DM_EXPANSIONS);
@@ -925,7 +926,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public Tweet getTweet(String tweetId) {
-        String              url        = getUrlHelper().getTweetUrl(tweetId);
+        String url = getUrlHelper().getTweetUrl(tweetId);
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, ALL_EXPANSIONS);
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
@@ -936,14 +937,14 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public TweetList getTweets(List<String> tweetIds) {
-        String              url        = getUrlHelper().getTweetsUrl();
+        String url = getUrlHelper().getTweetsUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, ALL_EXPANSIONS);
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
         parameters.put(USER_FIELDS, ALL_USER_FIELDS);
         parameters.put(MEDIA_FIELD, ALL_MEDIA_FIELDS);
         StringBuilder result = new StringBuilder();
-        int           i      = 0;
+        int i = 0;
         while (i < tweetIds.size() && i < URLHelper.MAX_LOOKUP) {
             String id = tweetIds.get(i);
             result.append(id);
@@ -1024,9 +1025,9 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
      * Call an endpoint related to tweets recursively until next_token is null to provide a full result
      */
     private TweetList getTweetsRecursively(String url, Map<String, String> parameters, AbstractRequestHelper requestHelper) {
-        String    next;
-        TweetList result   = TweetList.builder().data(new ArrayList<>()).meta(new TweetMeta()).build();
-        String    newestId = null;
+        String next;
+        TweetList result = TweetList.builder().data(new ArrayList<>()).meta(new TweetMeta()).build();
+        String newestId = null;
         do {
             Optional<TweetList> tweetList = requestHelper.getRequestWithParameters(url, parameters, TweetList.class);
             if (!tweetList.isPresent() || tweetList.get().getData() == null) {
@@ -1059,7 +1060,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
      * Call an endpoint related to users recursively until next_token is null to provide a full result
      */
     private UserList getUsersRecursively(String url, Map<String, String> parameters, AbstractRequestHelper requestHelper) {
-        String   next;
+        String next;
         UserList result = UserList.builder().data(new ArrayList<>()).meta(new UserMeta()).build();
         do {
             Optional<UserList> userList = requestHelper.getRequestWithParameters(url, parameters, UserList.class);
@@ -1086,13 +1087,13 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
      */
     public List<Tweet> searchForTweetsWithin30days(String query, LocalDateTime fromDate, LocalDateTime toDate,
                                                    String envName) {
-        int                 count      = 100;
+        int count = 100;
         Map<String, String> parameters = new HashMap<>();
         parameters.put(QUERY, query);
         parameters.put("maxResults", String.valueOf(count));
         parameters.put("fromDate", ConverterHelper.getStringFromDate(fromDate));
         parameters.put("toDate", ConverterHelper.getStringFromDate(toDate));
-        String      next;
+        String next;
         List<Tweet> result = new ArrayList<>();
         do {
             Optional<TweetSearchResponseV1> tweetSearchV1DTO = getRequestHelper().getRequestWithParameters(
@@ -1114,13 +1115,13 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
      */
     public List<Tweet> searchForTweetsArchive(String query, LocalDateTime fromDate, LocalDateTime toDate,
                                               String envName) {
-        int                 count      = 100;
+        int count = 100;
         Map<String, String> parameters = new HashMap<>();
         parameters.put(QUERY, query);
         parameters.put(MAX_RESULTS, String.valueOf(count));
         parameters.put("fromDate", ConverterHelper.getStringFromDate(fromDate));
         parameters.put("toDate", ConverterHelper.getStringFromDate(toDate));
-        String      next;
+        String next;
         List<Tweet> result = new ArrayList<>();
         do {
             Optional<TweetSearchResponseV1> tweetSearchV1DTO = getRequestHelper().getRequestWithParameters(
@@ -1138,7 +1139,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public Future<Response> startFilteredStream(Consumer<Tweet> consumer) {
-        String              url        = urlHelper.getFilteredStreamUrl();
+        String url = urlHelper.getFilteredStreamUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, ALL_EXPANSIONS);
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
@@ -1154,7 +1155,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public Future<Response> startFilteredStream(IAPIEventListener listener, int backfillMinutes) {
-        String              url        = urlHelper.getFilteredStreamUrl();
+        String url = urlHelper.getFilteredStreamUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, ALL_EXPANSIONS);
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
@@ -1195,17 +1196,17 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public List<StreamRule> retrieveFilteredStreamRules() {
-        String      url    = urlHelper.getFilteredStreamRulesUrl();
+        String url = urlHelper.getFilteredStreamRulesUrl();
         StreamRules result = requestHelperV2.getRequest(url, StreamRules.class).orElseThrow(NoSuchElementException::new);
         return result.getData();
     }
 
     @Override
     public StreamRule addFilteredStreamRule(String value, String tag) {
-        String     url  = urlHelper.getFilteredStreamRulesUrl();
+        String url = urlHelper.getFilteredStreamRulesUrl();
         StreamRule rule = StreamRule.builder().value(value).tag(tag).build();
         try {
-            String      body   = "{\"add\": [" + JsonHelper.toJson(rule) + "]}";
+            String body = "{\"add\": [" + JsonHelper.toJson(rule) + "]}";
             StreamRules result = requestHelperV2.postRequest(url, body, StreamRules.class).orElseThrow(NoSuchElementException::new);
             if (result.getData() == null || result.getData().isEmpty()) {
                 LOGGER.error("Could not add filtered stream rule. Rule maybe already exists.");
@@ -1230,23 +1231,23 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public StreamMeta deleteFilteredStreamRule(String ruleValue) {
-        String      url    = urlHelper.getFilteredStreamRulesUrl();
-        String      body   = "{\"delete\": {\"values\": [\"" + ruleValue + "\"]}}";
+        String url = urlHelper.getFilteredStreamRulesUrl();
+        String body = "{\"delete\": {\"values\": [\"" + ruleValue + "\"]}}";
         StreamRules result = requestHelperV2.postRequest(url, body, StreamRules.class).orElseThrow(NoSuchElementException::new);
         return result.getMeta();
     }
 
     @Override
     public StreamMeta deleteFilteredStreamRuleId(String ruleId) {
-        String      url    = urlHelper.getFilteredStreamRulesUrl();
-        String      body   = "{\"delete\": {\"ids\": [\"" + ruleId + "\"]}}";
+        String url = urlHelper.getFilteredStreamRulesUrl();
+        String body = "{\"delete\": {\"ids\": [\"" + ruleId + "\"]}}";
         StreamRules result = requestHelperV2.postRequest(url, body, StreamRules.class).orElseThrow(NoSuchElementException::new);
         return result.getMeta();
     }
 
     @Override
     public Future<Response> startSampledStream(Consumer<Tweet> consumer) {
-        String              url        = urlHelper.getSampledStreamUrl();
+        String url = urlHelper.getSampledStreamUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, ALL_EXPANSIONS);
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
@@ -1262,7 +1263,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public Future<Response> startSampledStream(IAPIEventListener listener, int backfillMinutes) {
-        String              url        = urlHelper.getSampledStreamUrl();
+        String url = urlHelper.getSampledStreamUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put(EXPANSION, ALL_EXPANSIONS);
         parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS);
@@ -1296,6 +1297,24 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
             parameters.put(MAX_RESULTS, String.valueOf(100));
         }
         return getTweetsRecursively(url, parameters, getRequestHelperV2());
+    }
+
+    public TweetList getUserTimelineWithAllMetrics(String userId, AdditionalParameters additionalParameters) {
+        Map<String, String> parameters = additionalParameters.getMapFromParameters();
+        parameters.put(TWEET_FIELDS, ALL_TWEET_FIELDS_NON);
+        parameters.put(MEDIA_FIELD, ALL_MEDIA_FIELDS_NON);
+        parameters.put(EXPANSION, ALL_EXPANSIONS);
+        parameters.put(USER_FIELDS, ALL_USER_FIELDS);
+        parameters.put(PLACE_FIELDS, ALL_PLACE_FIELDS);
+        parameters.put(POLL_FIELDS, ALL_POLL_FIELDS);
+        String url = urlHelper.getUserTimelineUrl(userId);
+        if (!additionalParameters.isRecursiveCall()) {
+            return getRequestHelper().getRequestWithParameters(url, parameters, TweetList.class).orElseThrow(NoSuchElementException::new);
+        }
+        if (additionalParameters.getMaxResults() <= 0) {
+            parameters.put(MAX_RESULTS, String.valueOf(100));
+        }
+        return getTweetsRecursively(url, parameters, getRequestHelper());
     }
 
     @Override
@@ -1341,7 +1360,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public BearerToken getOAuth2RefreshToken(String refreshToken, String clientId) {
-        String              url     = URLHelper.ACCESS_TOKEN_URL;
+        String url = URLHelper.ACCESS_TOKEN_URL;
         Map<String, String> headers = new HashMap<>();
         headers.put("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8");
         Map<String, String> params = new HashMap<>();
@@ -1353,7 +1372,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public BearerToken getOAuth2AccessToken(String clientId, String code, String codeVerifier, String redirectUri) {
-        String              url    = URLHelper.ACCESS_TOKEN_URL;
+        String url = URLHelper.ACCESS_TOKEN_URL;
         Map<String, String> params = new HashMap<>();
         params.put("client_id", clientId);
         params.put("code", code);
@@ -1371,13 +1390,13 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public RequestToken getOauth1Token(String oauthCallback) {
-        String              url        = URLHelper.GET_OAUTH1_TOKEN_URL;
+        String url = URLHelper.GET_OAUTH1_TOKEN_URL;
         Map<String, String> parameters = new HashMap<>();
         if (oauthCallback != null) {
             parameters.put("oauth_callback", oauthCallback);
         }
-        String       stringResponse = requestHelperV1.postRequest(url, parameters, String.class).orElseThrow(NoSuchElementException::new);
-        RequestToken requestToken   = new RequestToken(stringResponse);
+        String stringResponse = requestHelperV1.postRequest(url, parameters, String.class).orElseThrow(NoSuchElementException::new);
+        RequestToken requestToken = new RequestToken(stringResponse);
         LOGGER.info("Open the following URL to grant access to your account:");
         LOGGER.info("https://twitter.com/oauth/authenticate?oauth_token={}", requestToken.getOauthToken());
         return requestToken;
@@ -1385,7 +1404,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public RequestToken getOAuth1AccessToken(RequestToken requestToken, String pinCode) {
-        String              url        = URLHelper.GET_OAUTH1_ACCESS_TOKEN_URL;
+        String url = URLHelper.GET_OAUTH1_ACCESS_TOKEN_URL;
         Map<String, String> parameters = new HashMap<>();
         parameters.put("oauth_verifier", pinCode);
         parameters.put("oauth_token", requestToken.getOauthToken());
@@ -1433,7 +1452,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public CollectionsResponse collectionsCreate(String name, String description, String collectionUrl, TimeLineOrder timeLineOrder) {
-        String              url        = getUrlHelper().getCollectionsCreateUrl();
+        String url = getUrlHelper().getCollectionsCreateUrl();
         Map<String, String> parameters = new HashMap<>();
         parameters.put("name", name);
         parameters.put("description", description);
@@ -1486,10 +1505,10 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public List<io.github.redouane59.twitter.dto.dm.deprecatedV1.DirectMessage> getDmList(int count) {
-        List<io.github.redouane59.twitter.dto.dm.deprecatedV1.DirectMessage> result   = new ArrayList<>();
-        int                                                                  maxCount = 50;
-        String                                                               url      = getUrlHelper().getDMListUrl(maxCount);
-        DmListAnswer                                                         dmListAnswer;
+        List<io.github.redouane59.twitter.dto.dm.deprecatedV1.DirectMessage> result = new ArrayList<>();
+        int maxCount = 50;
+        String url = getUrlHelper().getDMListUrl(maxCount);
+        DmListAnswer dmListAnswer;
         do {
             dmListAnswer = requestHelperV1.getRequest(url, DmListAnswer.class).orElseThrow(NoSuchElementException::new);
             result.addAll(dmListAnswer.getDirectMessages());
@@ -1527,7 +1546,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     @Override
     public CollectionsResponse collectionsEntries(final String collectionId, int count, String maxPosition, String minPosition) {
-        String              url        = getUrlHelper().getCollectionsEntriesUrl(collectionId);
+        String url = getUrlHelper().getCollectionsEntriesUrl(collectionId);
         Map<String, String> parameters = new HashMap<>();
         if (count > 0) {
             parameters.put("count", Integer.toString(count));
@@ -1562,18 +1581,6 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     /*----------------------------------------------------------------------------------------------------------------*/
     @Override
     public Tweet postTweetV1(final String text) {
@@ -1585,14 +1592,14 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
     public Tweet postTweetV1(final TweetParameters tweetParameters) {
         String url = getUrlHelper().getPostTweetUrlV1();
         Map<String, String> parameters = new HashMap<>(2);
-        if(StringUtils.isNotBlank(tweetParameters.getStatus())){
+        if (StringUtils.isNotBlank(tweetParameters.getStatus())) {
             parameters.put("status", tweetParameters.getStatus());
         }
-        if(Objects.nonNull(tweetParameters.getMedia()) && !tweetParameters.getMedia().getMediaIds().isEmpty()){
+        if (Objects.nonNull(tweetParameters.getMedia()) && !tweetParameters.getMedia().getMediaIds().isEmpty()) {
             parameters.put("media_ids", String.join(",", tweetParameters.getMedia().getMediaIds()));
         }
         Map<String, String> oauthParams = buildOauthParams(url);
-        Map<String, String> headers  = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", buildHeader(oauthParams));
         return getRequestHelperV1().makeRequest(Verb.POST, url, headers, parameters, null, true, TweetV1.class).orElseThrow(NoSuchElementException::new);
     }
@@ -1629,6 +1636,7 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
 
     public static final String ALL_MEDIA_FIELDS_NON =
             "non_public_metrics,organic_metrics,duration_ms,height,media_key,preview_image_url,public_metrics,type,url,width,alt_text,variants";
+
     @Override
     public Tweet getTweetNON(String tweetId) {
         String url = getUrlHelper().getTweetUrl(tweetId);
