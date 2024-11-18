@@ -25,9 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public abstract class AbstractRequestHelper {
 
-//  public static final int                 DEFAULT_RETRY_AFTER_SEC = 300;
-  // 减少循环次数
-  public static final int                 DEFAULT_RETRY_AFTER_SEC = 5;
+  public static final int                 DEFAULT_RETRY_AFTER_SEC = 300;
   protected final     TweetStreamConsumer tweetStreamConsumer     = new TweetStreamConsumer();
   private final       TwitterCredentials  twitterCredentials;
   private final       OAuth10aService     service;
@@ -126,10 +124,10 @@ public abstract class AbstractRequestHelper {
             LOGGER.error("Using default retry after because header format is invalid: {}", retryAfterStr, e);
           }
         }
-        LOGGER.info("Rate limit exceeded, new retry in {} at {}", ConverterHelper.getSecondsAsText(retryAfter), ConverterHelper.minutesBeforeNow(
-            -retryAfter / 60).format(DateTimeFormatter.ofPattern("HH:mm")));
-        Thread.sleep(1000L * retryAfter);
-        return makeRequest(request, false, classType); // We have already signed if it was requested
+//        LOGGER.info("Rate limit exceeded, new retry in {} at {}", ConverterHelper.getSecondsAsText(retryAfter), ConverterHelper.minutesBeforeNow(
+//            -retryAfter / 60).format(DateTimeFormatter.ofPattern("HH:mm")));
+//        Thread.sleep(1000L * retryAfter);
+//        return makeRequest(request, false, classType); // We have already signed if it was requested
       } else if (response.getCode() < 200 || response.getCode() > 299) {
         logApiError(request.getVerb().name(), request.getUrl(), stringResponse, response.getCode());
       }
