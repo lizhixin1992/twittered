@@ -25,7 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public abstract class AbstractRequestHelper {
 
-  public static final int                 DEFAULT_RETRY_AFTER_SEC = 300;
+//  public static final int                 DEFAULT_RETRY_AFTER_SEC = 300;
+  // 减少循环次数
+  public static final int                 DEFAULT_RETRY_AFTER_SEC = 5;
   protected final     TweetStreamConsumer tweetStreamConsumer     = new TweetStreamConsumer();
   private final       TwitterCredentials  twitterCredentials;
   private final       OAuth10aService     service;
@@ -108,7 +110,7 @@ public abstract class AbstractRequestHelper {
         int    retryAfter    = DEFAULT_RETRY_AFTER_SEC;
         String retryAfterStr = response.getHeader("x-rate-limit-reset");
         String rateRemainingStr = response.getHeader("x-rate-limit-remaining");
-        LOGGER.trace("Rate limit exceeded, x-rate-limit-reset: {} x-rate-limit-remaining: {}, x-rate-limit-limit:  {}", retryAfterStr, response.getHeader("x-rate-limit-remaining"), response.getHeader("x-rate-limit-limit"));
+        LOGGER.info("Rate limit exceeded, x-rate-limit-reset: {} x-rate-limit-remaining: {}, x-rate-limit-limit:  {}", retryAfterStr, response.getHeader("x-rate-limit-remaining"), response.getHeader("x-rate-limit-limit"));
         if (retryAfterStr != null && rateRemainingStr != null) {
           try {
        		int remaining  = Integer.parseInt(rateRemainingStr);
