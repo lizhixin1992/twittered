@@ -49,6 +49,18 @@ public class TweetV2 implements Tweet {
   @JsonProperty("matching_rules")
   private              List<StreamRules.StreamRule> matchingRules;
 
+
+  // 失败信息字段
+  @JsonProperty("detail")
+  private String                   detail;
+  @JsonProperty("type")
+  private String                   type;
+  @JsonProperty("title")
+  private String                   title;
+  @JsonProperty("status")
+  private int                      status;
+
+
   @Override
   public String getInReplyToStatusId() {
     if (data == null || data.getReferencedTweets() == null || data.getReferencedTweets().isEmpty()) {

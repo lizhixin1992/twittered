@@ -4,8 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.github.redouane59.twitter.dto.tweet.Tweet;
+import io.github.redouane59.twitter.dto.tweet.TweetV2;
 import io.github.redouane59.twitter.dto.user.User;
 import io.github.redouane59.twitter.dto.user.UserV2;
 import io.github.redouane59.twitter.helpers.ConverterHelper;
@@ -112,6 +114,15 @@ public class UserDeserializerV2Test {
   public void testProtectedACcount() {
     assertTrue(userV2.isProtectedAccount());
   }
+
+  @Test
+  public void testErrorModel() throws JsonProcessingException {
+    String json = "{\"detail\":\"You are not allowed to create a Tweet with duplicate content.\",\"type\":\"about:blank\",\"title\":\"Forbidden\",\"status\":403}";
+//    String json = "{\"data\":{\"id\":\"1445880548472328192\",\"text\":\"Are you excited for the weekend?\"}}";
+    TweetV2 tweetV2 = JsonHelper.fromJson(json, TweetV2.class);
+    System.out.println(JSON.toJSONString(tweetV2));
+  }
+
 
 }
 
