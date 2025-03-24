@@ -22,6 +22,7 @@ import io.github.redouane59.twitter.dto.tweet.MediaCategory;
 import io.github.redouane59.twitter.dto.tweet.ReplySettings;
 import io.github.redouane59.twitter.dto.tweet.RetweetResponse;
 import io.github.redouane59.twitter.dto.tweet.Tweet;
+import io.github.redouane59.twitter.dto.tweet.TweetList;
 import io.github.redouane59.twitter.dto.tweet.TweetParameters;
 import io.github.redouane59.twitter.dto.tweet.TweetParameters.Media;
 import io.github.redouane59.twitter.dto.tweet.TweetParameters.Poll;
@@ -41,6 +42,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
@@ -56,7 +59,7 @@ public class ITwitterClientV2AuthenticatedTest {
   @BeforeAll
   public static void init() {
     twitterClient = new TwitterClient();
-    userId        = twitterClient.getUserIdFromAccessToken();
+//    userId        = twitterClient.getUserIdFromAccessToken();
   }
 
   @Test
@@ -481,4 +484,80 @@ public class ITwitterClientV2AuthenticatedTest {
     }
   }
 
+
+  @Test
+  public void testUploadMediaChunkedV2() {
+    twitterClient = new TwitterClient(TwitterCredentials.builder()
+            .bearerToken("")
+            .build());
+
+    File file = new File("/Users/lizhixin/Downloads/pexels-pixabay-33109.jpg");
+    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_IMAGE);
+
+
+//    File file = new File("/Users/lizhixin/Downloads/test-gif.gif");
+//    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_GIF);
+
+
+//    File file = new File("/Users/lizhixin/Downloads/ff37d0f68bb549cbbe9d70e34ff79aef.mp4");
+//    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.AMPLIFY_VIDEO);
+
+
+    System.out.println(JSON.toJSONString(uploadMediaResponse));
+
+  }
+
+
+  @Test
+  public void testpostTweetV2() {
+    twitterClient = new TwitterClient(TwitterCredentials.builder()
+            .bearerToken("")
+            .build());
+
+    File file = new File("/Users/lizhixin/Downloads/pexels-pixabay-33109.jpg");
+    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_IMAGE);
+
+
+//    File file = new File("/Users/lizhixin/Downloads/test-gif.gif");
+//    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_GIF);
+
+
+//    File file = new File("/Users/lizhixin/Downloads/ff37d0f68bb549cbbe9d70e34ff79aef.mp4");
+//    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.AMPLIFY_VIDEO);
+
+    System.out.println("uploadMediaResponse: "+JSON.toJSONString(uploadMediaResponse));
+
+    TweetParameters parameters = TweetParameters.builder()
+            .media(Media.builder()
+                    .mediaIds(Collections.singletonList(uploadMediaResponse.getMediaId()))
+                    .build())
+            .text("test v2 api image")
+//            .text("test v2 api gif")
+//            .text("test v2 api video")
+            .build();
+    Tweet tweet = twitterClient.postTweetV2(parameters);
+
+    System.out.println("tweet is post");
+
+
+  }
+
+  @Test
+  public void testSearchTweets() {
+    twitterClient = new TwitterClient(TwitterCredentials.builder()
+            .bearerToken("")
+            .build());
+    String query = "from:" + "lzx920911" + " \"" + "test v2 api imag" + "\"";
+    TweetList searchTweets = twitterClient.searchTweets(query, AdditionalParameters.builder().recursiveCall(false).maxResults(10).build());
+    System.out.println(JSON.toJSONString(searchTweets));
+  }
+
+  @Test
+  public void testDeleteTweetV2() {
+    twitterClient = new TwitterClient(TwitterCredentials.builder()
+            .bearerToken("")
+            .build());
+    boolean deleted = twitterClient.deleteTweetV2("1904071530415640851");
+    System.out.println("delete: " + deleted);
+  }
 }

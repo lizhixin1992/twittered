@@ -1666,4 +1666,54 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
         parameters.put("ids", result.toString());
         return getRequestHelper().getRequestWithParameters(url, parameters, TweetList.class).orElseThrow(NoSuchElementException::new);
     }
+
+
+    /**
+     * 分片上传媒体文件
+     *
+     * @author lizhixin
+     * @date 2025/3/20 11:59
+     */
+    @Override
+    public UploadMediaResponse uploadMediaChunkedV2(File imageFile, MediaCategory mediaCategory) {
+        //分片上传
+        String url = urlHelper.getUploadMediaUrlV2();
+        try {
+            byte[] data = Files.readAllBytes(imageFile.toPath());
+            InputStream input = new ByteArrayInputStream(data);
+            return getRequestHelperV2().uploadMediaChunkedV2(url, imageFile.getName(), input, UploadMediaResponse.class, mediaCategory.label).orElseThrow(NoSuchElementException::new);
+        } catch (Exception e) {
+            LOGGER.error("uploadMedia is Exception!", e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * V2版本发布稿件
+     *
+     * @author     lizhixin
+     * @date       2025/3/24 15:10
+     */
+    @SneakyThrows
+    @Override
+    public Tweet postTweetV2(final TweetParameters tweetParameters) {
+        String url = getUrlHelper().getPostTweetUrl();
+        String body = JsonHelper.toJson(tweetParameters);
+        return getRequestHelperV2().postRequestWithBodyJson(url, new HashMap<>(), body, TweetV2.class).orElseThrow(NoSuchElementException::new);
+    }
+
+    /**
+     * V2版本删除稿件
+     *
+     * @author     lizhixin
+     * @date       2025/3/24 15:33
+     */
+    @Override
+    public boolean deleteTweetV2(final String tweetId) {
+        String url = getUrlHelper().getPostTweetUrl() + "/" + tweetId;
+        JsonNode jsonNode = getRequestHelperV2().makeRequest(Verb.DELETE, url, new HashMap<>(), null, true, JsonNode.class)
+                .orElseThrow(NoSuchElementException::new);
+        return jsonNode.get(DATA).get(DELETED).asBoolean();
+    }
+
 }

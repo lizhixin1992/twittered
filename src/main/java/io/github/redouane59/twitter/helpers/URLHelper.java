@@ -341,4 +341,8 @@ public class URLHelper {
 
   @Getter
   private final String postTweetUrlV1           = "https://api.twitter.com/1.1/statuses/update.json";
+
+  public String getUploadMediaUrlV2() {
+    return "https://api.x.com/2/media/upload";
+  }
 }

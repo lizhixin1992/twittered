@@ -17,14 +17,18 @@ import io.github.redouane59.twitter.dto.space.SpaceState;
 import io.github.redouane59.twitter.dto.stream.StreamRules.StreamMeta;
 import io.github.redouane59.twitter.dto.stream.StreamRules.StreamRule;
 import io.github.redouane59.twitter.dto.tweet.LikeResponse;
+import io.github.redouane59.twitter.dto.tweet.MediaCategory;
 import io.github.redouane59.twitter.dto.tweet.RetweetResponse;
 import io.github.redouane59.twitter.dto.tweet.Tweet;
 import io.github.redouane59.twitter.dto.tweet.TweetCountsList;
 import io.github.redouane59.twitter.dto.tweet.TweetList;
 import io.github.redouane59.twitter.dto.tweet.TweetParameters;
+import io.github.redouane59.twitter.dto.tweet.UploadMediaResponse;
 import io.github.redouane59.twitter.dto.user.User;
 import io.github.redouane59.twitter.dto.user.UserActionResponse;
 import io.github.redouane59.twitter.dto.user.UserList;
+
+import java.io.File;
 import java.util.List;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -742,4 +746,19 @@ public interface ITwitterClientV2 {
    * @return a tweet object list
    */
   TweetList getTweetsNON(List<String> tweetIds);
+
+  /**
+   * Upload a media calling https://docs.x.com/x-api/media/quickstart/media-upload-chunked
+   */
+  UploadMediaResponse uploadMediaChunkedV2(File media, MediaCategory mediaCategory);
+
+  /**
+   * Creation of a Post calling https://api.twitter.com/2/tweets
+   */
+  Tweet postTweetV2(final TweetParameters tweetParameters);
+
+  /**
+   * Deletion of a Post calling https://api.twitter.com/2/tweets/{id}
+   */
+  boolean deleteTweetV2(final String tweetId);
 }

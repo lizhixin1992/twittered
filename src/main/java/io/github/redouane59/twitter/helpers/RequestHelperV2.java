@@ -1,5 +1,7 @@
 package io.github.redouane59.twitter.helpers;
 
+import com.alibaba.fastjson.JSON;
+import com.github.scribejava.core.httpclient.multipart.FileByteArrayBodyPartPayload;
 import com.github.scribejava.core.model.OAuthAsyncRequestCallback;
 import com.github.scribejava.core.model.OAuthConstants;
 import com.github.scribejava.core.model.OAuthRequest;
@@ -8,23 +10,38 @@ import com.github.scribejava.core.model.Verb;
 import com.github.scribejava.core.oauth.OAuth10aService;
 import io.github.redouane59.twitter.IAPIEventListener;
 import io.github.redouane59.twitter.dto.others.BearerToken;
+import io.github.redouane59.twitter.dto.tweet.MediaCategory;
 import io.github.redouane59.twitter.dto.tweet.Tweet;
 import io.github.redouane59.twitter.dto.tweet.TweetV2;
+import io.github.redouane59.twitter.dto.tweet.UploadMediaResponse;
+import io.github.redouane59.twitter.dto.tweet.UploadMediaResponseV2;
+import io.github.redouane59.twitter.dto.tweet.UploadedMedia;
+import io.github.redouane59.twitter.dto.tweet.UploadedMediaV2;
 import io.github.redouane59.twitter.signature.Scope;
 import io.github.redouane59.twitter.signature.TwitterCredentials;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.message.BasicNameValuePair;
@@ -128,7 +145,7 @@ public class RequestHelperV2 extends AbstractRequestHelper {
 
   @Override
   protected void signRequest(OAuthRequest request) {
-    request.addHeader(OAuthConstants.HEADER, "Bearer " + getBearerToken());
+    request.addHeader(OAuthConstants.HEADER, "Bearer " + getPKCEBearerToken());
   }
 
   public String getBearerToken() {
@@ -146,6 +163,10 @@ public class RequestHelperV2 extends AbstractRequestHelper {
     }
     return getTwitterCredentials().getBearerToken();
   }
+
+    public String getPKCEBearerToken() {
+        return getTwitterCredentials().getBearerToken();
+    }
 
   /**
    * @param clientId Can be found in the developer portal under the header "Client ID".
@@ -187,4 +208,221 @@ public class RequestHelperV2 extends AbstractRequestHelper {
     return builder.build().toString();
   }
 
+
+    /****************************************twitter V2版本方法*************************************************************/
+    private final String CHUNKED_INIT = "INIT";
+    private final String CHUNKED_APPEND = "APPEND";
+    private final String CHUNKED_FINALIZE = "FINALIZE";
+    private final String CHUNKED_STATUS = "STATUS";
+    /**
+     * 1 MByte
+     */
+    private final int MB = 1024 * 1024;
+    /**
+     * 512MB is a constraint  imposed by Twitter for video files
+     */
+    private final int MAX_VIDEO_SIZE = 512 * MB;
+    /**
+     * 15MB is a constraint  imposed by Twitter for gif files
+     */
+    private final int MAX_GIF_SIZE = 15 * MB;
+    /**
+     * max chunk size
+     */
+    private final int CHUNK_SIZE = 5 * MB;
+
+    /**
+     * 分片上传媒体文件
+     *
+     * @author lizhixin
+     * @date 2025/3/20 11:59
+     */
+    public <T> Optional<T> uploadMediaChunkedV2(String url, String fileName, InputStream media, Class<T> classType, String mediaCategory) throws Exception {
+        byte[] dataBytes;
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream(256 * 1024);
+            byte[] buffer = new byte[32768];
+            int n;
+            while ((n = media.read(buffer)) != -1) {
+                baos.write(buffer, 0, n);
+            }
+            dataBytes = baos.toByteArray();
+            if (MediaCategory.AMPLIFY_VIDEO.label.equals(mediaCategory)) {
+                if (dataBytes.length > MAX_VIDEO_SIZE) {
+                    LOGGER.error(String.format(Locale.US,
+                            "video file can't be longer than: %d MBytes",
+                            MAX_VIDEO_SIZE / MB));
+                    throw new RuntimeException("video file can't be longer than: " + MAX_VIDEO_SIZE / MB + " MBytes");
+                }
+            } else if (MediaCategory.TWEET_GIF.label.equals(mediaCategory)) {
+                if (dataBytes.length > MAX_GIF_SIZE) {
+                    LOGGER.error(String.format(Locale.US,
+                            "gif file can't be longer than: %d MBytes",
+                            MAX_GIF_SIZE / MB));
+                    throw new RuntimeException("gif file can't be longer than: " + MAX_GIF_SIZE / MB + " MBytes");
+                }
+            }
+
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to download the file.", ioe);
+            throw new RuntimeException("Failed to download the file.", ioe);
+        }
+
+        try {
+            //初始化 init
+            Optional<UploadMediaResponseV2> initUploadMediaResponse = uploadMediaChunkedInitV2(dataBytes.length, url, mediaCategory);
+            ByteArrayInputStream dataInputStream = new ByteArrayInputStream(dataBytes);
+
+            byte[] segmentData = new byte[CHUNK_SIZE];
+            int segmentIndex = 0;
+            int totalRead = 0;
+            int bytesRead = 0;
+
+            //分片上传文件
+            while ((bytesRead = dataInputStream.read(segmentData)) > 0) {
+                totalRead = totalRead + bytesRead;
+                LOGGER.info("Chunked appened, segment index:" + segmentIndex + " bytes:" + totalRead + "/" + dataBytes.length);
+                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(segmentData, 0, bytesRead);
+                byte[] byteArray = IOUtils.toByteArray(byteArrayInputStream);
+                uploadMediaChunkedAppendV2(fileName, byteArray, segmentIndex, initUploadMediaResponse.get().getData().getId(), url);
+
+                segmentData = new byte[CHUNK_SIZE];
+                segmentIndex++;
+            }
+            //分片信息发送完后，通知twitter，反查文件上传状态，等待twitter通知
+            UploadedMediaV2 uploadedMedia = uploadMediaChunkedFinalizeV2(initUploadMediaResponse.get().getData().getId(), url, dataBytes.length);
+            UploadMediaResponse uploadMediaResponse = new UploadMediaResponse();
+            uploadMediaResponse.setMediaId(String.valueOf(uploadedMedia.getId()));
+            return (Optional<T>) Optional.ofNullable(uploadMediaResponse);
+        } catch (Exception e) {
+            LOGGER.error("uploadMediaChunked is error.", e);
+            throw new RuntimeException("uploadMediaChunked is error..", e);
+        }
+    }
+
+    /**
+     * twitter文件上传初始化 init
+     *
+     * @author lizhixin
+     * @date 2022/4/28 13:32
+     */
+    private Optional<UploadMediaResponseV2> uploadMediaChunkedInitV2(long size, String url, String mediaCategory) {
+        OAuthRequest request = new OAuthRequest(Verb.POST, url);
+        request.addBodyParameter("command", CHUNKED_INIT);
+        if (MediaCategory.AMPLIFY_VIDEO.label.equals(mediaCategory)) {
+            request.addBodyParameter("media_type", "video/mp4");
+        } else if (MediaCategory.TWEET_GIF.label.equals(mediaCategory)) {
+            request.addBodyParameter("media_type", "image/gif");
+        }
+        request.addBodyParameter("media_category", mediaCategory);
+        request.addBodyParameter("total_bytes", String.valueOf(size));
+        Optional<UploadMediaResponseV2> initUploadMediaResponse = makeRequest(request, true, UploadMediaResponseV2.class);
+        LOGGER.info("mediaId : {}, mediaKey : {}, expiresAfterSecs : {}, size : {}",
+                initUploadMediaResponse.get().getData().getId(),
+                initUploadMediaResponse.get().getData().getMediaKey(),
+                initUploadMediaResponse.get().getData().getExpiresAfterSecs(),
+                initUploadMediaResponse.get().getData().getSize());
+        return initUploadMediaResponse;
+    }
+
+    /**
+     * 分片上传文件
+     *
+     * @author lizhixin
+     * @date 2022/4/28 13:31
+     */
+    private void uploadMediaChunkedAppendV2(String fileName, byte[] byteArray, int segmentIndex, String mediaId, String url) {
+        OAuthRequest request = new OAuthRequest(Verb.POST, url);
+        request.initMultipartPayload();
+        request.addHeader("Content-Type", "multipart/form-data");
+        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", CHUNKED_APPEND.getBytes(StandardCharsets.UTF_8), "command"));
+        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", mediaId.getBytes(StandardCharsets.UTF_8), "media_id"));
+        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", String.valueOf(segmentIndex).getBytes(StandardCharsets.UTF_8), "segment_index"));
+        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", byteArray, "media", fileName));
+        makeRequest(request, true);
+    }
+
+    /**
+     * 分片信息发送完后，通知twitter，反查文件上传状态，等待twitter通知
+     *
+     * @author lizhixin
+     * @date 2022/4/28 13:31
+     */
+    private UploadedMediaV2 uploadMediaChunkedFinalizeV2(String mediaId, String url, Integer fileSize) throws Exception {
+        int tries = 0;
+        int maxTries = 20;
+        int lastProgressPercent = 0;
+        int currentProgressPercent = 0;
+        //通知twitter发送完成 FINALIZE
+        UploadedMediaV2 uploadMediaChunkedFinalize0 = uploadMediaChunkedFinalize0V2(mediaId, url);
+
+        // 如果没有 processing_info 字段，则认为上传成功, 直接返回
+        if(StringUtils.isNotBlank(uploadMediaChunkedFinalize0.getProcessingState())){
+            while (tries < maxTries) {
+                if (lastProgressPercent == currentProgressPercent) {
+                    tries++;
+                }
+                lastProgressPercent = currentProgressPercent;
+                String state = uploadMediaChunkedFinalize0.getProcessingState();
+                if (("failed").equalsIgnoreCase(state)) {
+                    LOGGER.error("Failed to finalize the chuncked upload.");
+                    throw new RuntimeException("Failed to finalize the chuncked upload.");
+                }
+                if (("pending").equalsIgnoreCase(state) || ("in_progress").equalsIgnoreCase(state)) {
+                    currentProgressPercent = Objects.isNull(uploadMediaChunkedFinalize0.getProgressPercent()) ? 0 : uploadMediaChunkedFinalize0.getProgressPercent();
+                    int waitSec = Math.max(uploadMediaChunkedFinalize0.getProcessingCheckAfterSecs(), 1);
+                    LOGGER.info("Chunked finalize, wait for:" + waitSec + " sec");
+                    try {
+                        Thread.sleep(waitSec * 1000);
+                    } catch (InterruptedException e) {
+                        LOGGER.error("Failed to finalize the chuncked upload.", e);
+                        throw new RuntimeException("Failed to finalize the chuncked upload.", e);
+                    }
+                }
+                if (("succeeded").equalsIgnoreCase(state)) {
+                    return uploadMediaChunkedFinalize0;
+                }
+                //查询文件上传状态
+                uploadMediaChunkedFinalize0 = uploadMediaChunkedStatusV2(mediaId, url);
+            }
+            LOGGER.error("Failed to finalize the chuncked upload, progress has stopped, tried " + tries + 1 + " times.");
+            throw new RuntimeException("Failed to finalize the chuncked upload, progress has stopped, tried " + tries + 1 + " times.");
+        }else{
+            return uploadMediaChunkedFinalize0;
+        }
+    }
+
+    /**
+     * 通知twitter发送完成 FINALIZE
+     *
+     * @author lizhixin
+     * @date 2022/4/28 13:31
+     */
+    private UploadedMediaV2 uploadMediaChunkedFinalize0V2(String mediaId, String url) throws Exception {
+        OAuthRequest request = new OAuthRequest(Verb.POST, url);
+        request.addBodyParameter("command", CHUNKED_FINALIZE);
+        request.addBodyParameter("media_id", mediaId);
+        String chunkedFinalize = makeRequest(request, true);
+        LOGGER.info("Finalize response:" + chunkedFinalize);
+        return new UploadedMediaV2(JSON.parseObject(chunkedFinalize));
+    }
+
+    /**
+     * 查询文件上传状态
+     *
+     * @author lizhixin
+     * @date 2022/4/28 13:31
+     */
+    private UploadedMediaV2 uploadMediaChunkedStatusV2(String mediaId, String url) throws Exception {
+        OAuthRequest request = new OAuthRequest(Verb.GET, url);
+        request.addQuerystringParameter("command", CHUNKED_STATUS);
+        request.addQuerystringParameter("media_id", mediaId);
+        String chunkedFinalize00 = makeRequest(request, true);
+        LOGGER.info("Status response:" + chunkedFinalize00);
+        return new UploadedMediaV2(JSON.parseObject(chunkedFinalize00));
+    }
+
+    public <T> Optional<T> postRequestWithBodyJson(String url, Map<String, String> parameters, String requestBodyJson, Class<T> classType) {
+        return makeRequest(Verb.POST, url, parameters, requestBodyJson, true, classType);
+    }
 }
