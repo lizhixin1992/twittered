@@ -229,7 +229,7 @@ public class RequestHelperV2 extends AbstractRequestHelper {
     /**
      * max chunk size
      */
-    private final int CHUNK_SIZE = 5 * MB;
+    private final int CHUNK_SIZE = 2 * MB;
 
     /**
      * 分片上传媒体文件

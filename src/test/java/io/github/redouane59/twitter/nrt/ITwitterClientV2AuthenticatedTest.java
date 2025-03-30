@@ -509,21 +509,21 @@ public class ITwitterClientV2AuthenticatedTest {
 
 
   @Test
-  public void testpostTweetV2() {
+  public void testPostTweetV2() {
     twitterClient = new TwitterClient(TwitterCredentials.builder()
             .bearerToken("")
             .build());
 
-    File file = new File("/Users/lizhixin/Downloads/pexels-pixabay-33109.jpg");
-    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_IMAGE);
+//    File file = new File("/Users/lizhixin/Downloads/pexels-pixabay-33109.jpg");
+//    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_IMAGE);
 
 
 //    File file = new File("/Users/lizhixin/Downloads/test-gif.gif");
 //    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_GIF);
 
 
-//    File file = new File("/Users/lizhixin/Downloads/ff37d0f68bb549cbbe9d70e34ff79aef.mp4");
-//    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.AMPLIFY_VIDEO);
+    File file = new File("/Users/lizhixin/Downloads/【农耕春秋】一分钟看懂敦煌壁画里画了啥.m4v");
+    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.AMPLIFY_VIDEO);
 
     System.out.println("uploadMediaResponse: "+JSON.toJSONString(uploadMediaResponse));
 
@@ -531,9 +531,9 @@ public class ITwitterClientV2AuthenticatedTest {
             .media(Media.builder()
                     .mediaIds(Collections.singletonList(uploadMediaResponse.getMediaId()))
                     .build())
-            .text("test v2 api image")
+//            .text("test v2 api image")
 //            .text("test v2 api gif")
-//            .text("test v2 api video")
+            .text("test v2 api video")
             .build();
     Tweet tweet = twitterClient.postTweetV2(parameters);
 
