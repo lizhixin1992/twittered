@@ -1,6 +1,7 @@
 package io.github.redouane59.twitter.helpers;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.github.scribejava.core.httpclient.multipart.FileByteArrayBodyPartPayload;
 import com.github.scribejava.core.model.OAuthAsyncRequestCallback;
 import com.github.scribejava.core.model.OAuthConstants;
@@ -307,16 +308,33 @@ public class RequestHelperV2 extends AbstractRequestHelper {
      * @date 2022/4/28 13:32
      */
     private Optional<UploadMediaResponseV2> uploadMediaChunkedInitV2(long size, String url, String mediaCategory) {
-        OAuthRequest request = new OAuthRequest(Verb.POST, url);
-        request.addBodyParameter("command", CHUNKED_INIT);
+//        OAuthRequest request = new OAuthRequest(Verb.POST, url);
+//        request.addBodyParameter("command", CHUNKED_INIT);
+//        if (MediaCategory.AMPLIFY_VIDEO.label.equals(mediaCategory)) {
+//            request.addBodyParameter("media_type", "video/mp4");
+//        } else if (MediaCategory.TWEET_GIF.label.equals(mediaCategory)) {
+//            request.addBodyParameter("media_type", "image/gif");
+//        }
+//        request.addBodyParameter("media_category", mediaCategory);
+//        request.addBodyParameter("total_bytes", String.valueOf(size));
+//        Optional<UploadMediaResponseV2> initUploadMediaResponse = makeRequest(request, true, UploadMediaResponseV2.class);
+//        LOGGER.info("mediaId : {}, mediaKey : {}, expiresAfterSecs : {}, size : {}",
+//                initUploadMediaResponse.get().getData().getId(),
+//                initUploadMediaResponse.get().getData().getMediaKey(),
+//                initUploadMediaResponse.get().getData().getExpiresAfterSecs(),
+//                initUploadMediaResponse.get().getData().getSize());
+//        return initUploadMediaResponse;
+
+        JSONObject body = new JSONObject();
         if (MediaCategory.AMPLIFY_VIDEO.label.equals(mediaCategory)) {
-            request.addBodyParameter("media_type", "video/mp4");
+            body.put("media_type", "video/mp4");
         } else if (MediaCategory.TWEET_GIF.label.equals(mediaCategory)) {
-            request.addBodyParameter("media_type", "image/gif");
+            body.put("media_type", "image/gif");
         }
-        request.addBodyParameter("media_category", mediaCategory);
-        request.addBodyParameter("total_bytes", String.valueOf(size));
-        Optional<UploadMediaResponseV2> initUploadMediaResponse = makeRequest(request, true, UploadMediaResponseV2.class);
+        body.put("media_category", mediaCategory);
+        body.put("total_bytes", size);
+
+        Optional<UploadMediaResponseV2> initUploadMediaResponse = makeRequest(Verb.POST, url + "/initialize", null, body.toJSONString(), true, UploadMediaResponseV2.class);
         LOGGER.info("mediaId : {}, mediaKey : {}, expiresAfterSecs : {}, size : {}",
                 initUploadMediaResponse.get().getData().getId(),
                 initUploadMediaResponse.get().getData().getMediaKey(),
@@ -332,14 +350,20 @@ public class RequestHelperV2 extends AbstractRequestHelper {
      * @date 2022/4/28 13:31
      */
     private void uploadMediaChunkedAppendV2(String fileName, byte[] byteArray, int segmentIndex, String mediaId, String url) {
-        OAuthRequest request = new OAuthRequest(Verb.POST, url);
-        request.initMultipartPayload();
-        request.addHeader("Content-Type", "multipart/form-data");
-        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", CHUNKED_APPEND.getBytes(StandardCharsets.UTF_8), "command"));
-        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", mediaId.getBytes(StandardCharsets.UTF_8), "media_id"));
-        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", String.valueOf(segmentIndex).getBytes(StandardCharsets.UTF_8), "segment_index"));
-        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", byteArray, "media", fileName));
-        makeRequest(request, true);
+//        OAuthRequest request = new OAuthRequest(Verb.POST, url);
+//        request.initMultipartPayload();
+//        request.addHeader("Content-Type", "multipart/form-data");
+//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", CHUNKED_APPEND.getBytes(StandardCharsets.UTF_8), "command"));
+//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", mediaId.getBytes(StandardCharsets.UTF_8), "media_id"));
+//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", String.valueOf(segmentIndex).getBytes(StandardCharsets.UTF_8), "segment_index"));
+//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", byteArray, "media", fileName));
+//        makeRequest(request, true);
+
+        JSONObject body = new JSONObject();
+        body.put("media_id", mediaId);
+        body.put("segment_index", segmentIndex);
+        body.put("media", byteArray);
+        makeRequest(Verb.POST, url + "/" + mediaId + "/append", null, body.toJSONString(), true);
     }
 
     /**
@@ -399,10 +423,14 @@ public class RequestHelperV2 extends AbstractRequestHelper {
      * @date 2022/4/28 13:31
      */
     private UploadedMediaV2 uploadMediaChunkedFinalize0V2(String mediaId, String url) throws Exception {
-        OAuthRequest request = new OAuthRequest(Verb.POST, url);
-        request.addBodyParameter("command", CHUNKED_FINALIZE);
-        request.addBodyParameter("media_id", mediaId);
-        String chunkedFinalize = makeRequest(request, true);
+//        OAuthRequest request = new OAuthRequest(Verb.POST, url);
+//        request.addBodyParameter("command", CHUNKED_FINALIZE);
+//        request.addBodyParameter("media_id", mediaId);
+//        String chunkedFinalize = makeRequest(request, true);
+//        LOGGER.info("Finalize response:" + chunkedFinalize);
+//        return new UploadedMediaV2(JSON.parseObject(chunkedFinalize));
+
+        String chunkedFinalize = makeRequest(Verb.POST, url + "/" + mediaId + "/finalize", null, null, true);
         LOGGER.info("Finalize response:" + chunkedFinalize);
         return new UploadedMediaV2(JSON.parseObject(chunkedFinalize));
     }

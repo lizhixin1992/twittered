@@ -182,4 +182,49 @@ public abstract class AbstractRequestHelper {
     LOGGER.info("stringResponse : {}", stringResponse);
     return stringResponse;
   }
+
+  @SneakyThrows
+  public String makeRequest(Verb verb, String url, Map<String, String> parameters, String body,
+                            boolean signRequired) {
+    OAuthRequest request = new OAuthRequest(verb, url);
+    if (parameters != null) {
+      for (Map.Entry<String, String> param : parameters.entrySet()) {
+        request.addQuerystringParameter(param.getKey(), param.getValue());
+      }
+    }
+    if (body != null && verb.isPermitBody()) {
+      request.setPayload(body.getBytes(StandardCharsets.UTF_8));
+      if (!request.getHeaders().containsKey("Content-Type")) {
+        request.addHeader("Content-Type", "application/json");
+      }
+    }
+
+    if (signRequired) {
+      signRequest(request);
+    }
+    Response response       = getService().execute(request);
+    String   stringResponse = response.getBody();
+    if (response.getCode() == 429) {
+      if (!automaticRetry) {
+        throw new LimitExceededException();
+      }
+      int    retryAfter    = DEFAULT_RETRY_AFTER_SEC;
+      String retryAfterStr = response.getHeader("Retry-After");
+      if (retryAfterStr != null) {
+        try {
+          retryAfter = Integer.parseInt(retryAfterStr);
+        } catch (NumberFormatException e) {
+          LOGGER.error("Using default retry after because header format is invalid: " + retryAfterStr, e);
+        }
+      }
+      LOGGER.info("Rate limit exceeded, new retry in " + ConverterHelper.getSecondsAsText(retryAfter) + " at " + ConverterHelper.minutesBeforeNow(
+              -retryAfter / 60).format(DateTimeFormatter.ofPattern("HH:mm")));
+      Thread.sleep(1000L * retryAfter);
+      return makeRequest(request, false);
+    } else if (response.getCode() < 200 || response.getCode() > 299) {
+      logApiError(request.getVerb().name(), request.getUrl(), stringResponse, response.getCode());
+    }
+    LOGGER.info("stringResponse : {}", stringResponse);
+    return stringResponse;
+  }
 }
