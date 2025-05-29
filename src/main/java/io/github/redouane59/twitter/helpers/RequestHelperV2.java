@@ -350,20 +350,20 @@ public class RequestHelperV2 extends AbstractRequestHelper {
      * @date 2022/4/28 13:31
      */
     private void uploadMediaChunkedAppendV2(String fileName, byte[] byteArray, int segmentIndex, String mediaId, String url) {
-//        OAuthRequest request = new OAuthRequest(Verb.POST, url);
-//        request.initMultipartPayload();
-//        request.addHeader("Content-Type", "multipart/form-data");
+        OAuthRequest request = new OAuthRequest(Verb.POST, url + "/" + mediaId + "/append");
+        request.initMultipartPayload();
+        request.addHeader("Content-Type", "multipart/form-data");
 //        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", CHUNKED_APPEND.getBytes(StandardCharsets.UTF_8), "command"));
-//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", mediaId.getBytes(StandardCharsets.UTF_8), "media_id"));
-//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", String.valueOf(segmentIndex).getBytes(StandardCharsets.UTF_8), "segment_index"));
-//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", byteArray, "media", fileName));
-//        makeRequest(request, true);
+        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", mediaId.getBytes(StandardCharsets.UTF_8), "media_id"));
+        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", String.valueOf(segmentIndex).getBytes(StandardCharsets.UTF_8), "segment_index"));
+        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", byteArray, "media", fileName));
+        makeRequest(request, true);
 
-        JSONObject body = new JSONObject();
-        body.put("media_id", mediaId);
-        body.put("segment_index", segmentIndex);
-        body.put("media", byteArray);
-        makeRequest(Verb.POST, url + "/" + mediaId + "/append", null, body.toJSONString(), true);
+//        JSONObject body  = new JSONObject();
+//        body.put("media_id", mediaId);
+//        body.put("segment_index", segmentIndex);
+//        body.put("media", byteArray);
+//        makeRequest(Verb.POST, url + "/" + mediaId + "/append", null, body.toJSONString(), true);
     }
 
     /**
