@@ -354,7 +354,7 @@ public class RequestHelperV2 extends AbstractRequestHelper {
         request.initMultipartPayload();
         request.addHeader("Content-Type", "multipart/form-data");
 //        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", CHUNKED_APPEND.getBytes(StandardCharsets.UTF_8), "command"));
-        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", mediaId.getBytes(StandardCharsets.UTF_8), "media_id"));
+//        request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", mediaId.getBytes(StandardCharsets.UTF_8), "media_id"));
         request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", String.valueOf(segmentIndex).getBytes(StandardCharsets.UTF_8), "segment_index"));
         request.addBodyPartPayloadInMultipartPayload(new FileByteArrayBodyPartPayload("form-data", byteArray, "media", fileName));
         makeRequest(request, true);

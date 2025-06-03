@@ -514,7 +514,7 @@ public class ITwitterClientV2AuthenticatedTest {
             .bearerToken("")
             .build());
 
-//    File file = new File("/Users/lizhixin/Downloads/pexels-pixabay-33109.jpg");
+//    File file = new File("/Users/lizhixin/Downloads/IMG_0055.JPG");
 //    UploadMediaResponse uploadMediaResponse = twitterClient.uploadMediaChunkedV2(file, MediaCategory.TWEET_IMAGE);
 
 
