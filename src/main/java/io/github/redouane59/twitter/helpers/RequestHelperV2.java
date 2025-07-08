@@ -23,9 +23,11 @@ import io.github.redouane59.twitter.signature.TwitterCredentials;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -230,7 +232,7 @@ public class RequestHelperV2 extends AbstractRequestHelper {
     /**
      * max chunk size
      */
-    private final int CHUNK_SIZE = 2 * MB;
+    private final int CHUNK_SIZE = 4 * MB;
 
     /**
      * 分片上传媒体文件
@@ -238,66 +240,73 @@ public class RequestHelperV2 extends AbstractRequestHelper {
      * @author lizhixin
      * @date 2025/3/20 11:59
      */
-    public <T> Optional<T> uploadMediaChunkedV2(String url, String fileName, InputStream media, Class<T> classType, String mediaCategory) throws Exception {
-        byte[] dataBytes;
+    public <T> Optional<T> uploadMediaChunkedV2(String url, File upFile, Class<T> classType, String mediaCategory) throws Exception {
+        InputStream media = Files.newInputStream(upFile.toPath());
+        String fileName = upFile.getName();
+
+        // 不再一次性读取整个文件到内存中
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream(256 * 1024);
-            byte[] buffer = new byte[32768];
-            int n;
-            while ((n = media.read(buffer)) != -1) {
-                baos.write(buffer, 0, n);
-            }
-            dataBytes = baos.toByteArray();
-            if (MediaCategory.AMPLIFY_VIDEO.label.equals(mediaCategory)) {
-                if (dataBytes.length > MAX_VIDEO_SIZE) {
-                    LOGGER.error(String.format(Locale.US,
-                            "video file can't be longer than: %d MBytes",
-                            MAX_VIDEO_SIZE / MB));
-                    throw new RuntimeException("video file can't be longer than: " + MAX_VIDEO_SIZE / MB + " MBytes");
-                }
-            } else if (MediaCategory.TWEET_GIF.label.equals(mediaCategory)) {
-                if (dataBytes.length > MAX_GIF_SIZE) {
-                    LOGGER.error(String.format(Locale.US,
-                            "gif file can't be longer than: %d MBytes",
-                            MAX_GIF_SIZE / MB));
-                    throw new RuntimeException("gif file can't be longer than: " + MAX_GIF_SIZE / MB + " MBytes");
-                }
+            long fileSize = upFile.length();
+            // 检查文件大小限制
+            // 视频文件暂时不做验证
+//            if (MediaCategory.AMPLIFY_VIDEO.label.equals(mediaCategory) && fileSize > MAX_VIDEO_SIZE) {
+//                LOGGER.error("video file can't be longer than: {} MBytes", MAX_VIDEO_SIZE / MB);
+//                throw new RuntimeException("video file can't be longer than: " + MAX_VIDEO_SIZE / MB + " MBytes");
+//            } else
+                if (MediaCategory.TWEET_GIF.label.equals(mediaCategory) && fileSize > MAX_GIF_SIZE) {
+                LOGGER.error("gif file can't be longer than: {} MBytes", MAX_GIF_SIZE / MB);
+                throw new RuntimeException("gif file can't be longer than: " + MAX_GIF_SIZE / MB + " MBytes");
             }
 
-        } catch (IOException ioe) {
-            LOGGER.error("Failed to download the file.", ioe);
-            throw new RuntimeException("Failed to download the file.", ioe);
-        }
+            // 初始化上传
+            Optional<UploadMediaResponseV2> initUploadMediaResponse = uploadMediaChunkedInitV2(fileSize, url, mediaCategory);
+            String mediaId = initUploadMediaResponse.get().getData().getId();
 
-        try {
-            //初始化 init
-            Optional<UploadMediaResponseV2> initUploadMediaResponse = uploadMediaChunkedInitV2(dataBytes.length, url, mediaCategory);
-            ByteArrayInputStream dataInputStream = new ByteArrayInputStream(dataBytes);
-
-            byte[] segmentData = new byte[CHUNK_SIZE];
+            // 直接从输入流读取并分片上传，不再将整个文件加载到内存
+            byte[] buffer = new byte[CHUNK_SIZE];
             int segmentIndex = 0;
             int totalRead = 0;
-            int bytesRead = 0;
+            int bytesRead;
 
-            //分片上传文件
-            while ((bytesRead = dataInputStream.read(segmentData)) > 0) {
-                totalRead = totalRead + bytesRead;
-                LOGGER.info("Chunked appened, segment index:" + segmentIndex + " bytes:" + totalRead + "/" + dataBytes.length);
-                ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(segmentData, 0, bytesRead);
-                byte[] byteArray = IOUtils.toByteArray(byteArrayInputStream);
-                uploadMediaChunkedAppendV2(fileName, byteArray, segmentIndex, initUploadMediaResponse.get().getData().getId(), url);
+            // 逐块读取并上传
+            while ((bytesRead = media.read(buffer)) > 0) {
+                totalRead += bytesRead;
+                LOGGER.info("Chunked appended, segment index: {}, bytes: {}/{}", segmentIndex, totalRead, fileSize);
 
-                segmentData = new byte[CHUNK_SIZE];
+                // 如果读取的数据不足一个完整的块，创建一个新的正确大小的数组
+                byte[] chunk;
+                if (bytesRead < buffer.length) {
+                    chunk = new byte[bytesRead];
+                    System.arraycopy(buffer, 0, chunk, 0, bytesRead);
+                } else {
+                    chunk = buffer;
+                }
+
+                // 上传当前块
+                uploadMediaChunkedAppendV2(fileName, chunk, segmentIndex, mediaId, url);
                 segmentIndex++;
             }
-            //分片信息发送完后，通知twitter，反查文件上传状态，等待twitter通知
-            UploadedMediaV2 uploadedMedia = uploadMediaChunkedFinalizeV2(initUploadMediaResponse.get().getData().getId(), url, dataBytes.length);
+
+            // 完成上传
+            UploadedMediaV2 uploadedMedia = uploadMediaChunkedFinalizeV2(mediaId, url, (int)fileSize);
             UploadMediaResponse uploadMediaResponse = new UploadMediaResponse();
             uploadMediaResponse.setMediaId(String.valueOf(uploadedMedia.getId()));
             return (Optional<T>) Optional.ofNullable(uploadMediaResponse);
+        } catch (IOException ioe) {
+            LOGGER.error("Failed to process the file.", ioe);
+            throw new RuntimeException("Failed to process the file.", ioe);
         } catch (Exception e) {
-            LOGGER.error("uploadMediaChunked is error.", e);
-            throw new RuntimeException("uploadMediaChunked is error..", e);
+            LOGGER.error("uploadMediaChunked error", e);
+            throw new RuntimeException("uploadMediaChunked error", e);
+        } finally {
+            // 确保关闭输入流
+            try {
+                if (media != null) {
+                    media.close();
+                }
+            } catch (IOException e) {
+                LOGGER.warn("Failed to close input stream", e);
+            }
         }
     }
 

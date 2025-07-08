@@ -71,6 +71,7 @@ import io.github.redouane59.twitter.signature.TwitterCredentials;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -1675,13 +1676,11 @@ public class TwitterClient implements ITwitterClientV1, ITwitterClientV2, ITwitt
      * @date 2025/3/20 11:59
      */
     @Override
-    public UploadMediaResponse uploadMediaChunkedV2(File imageFile, MediaCategory mediaCategory) {
+    public UploadMediaResponse uploadMediaChunkedV2(File upFile, MediaCategory mediaCategory) {
         //分片上传
         String url = urlHelper.getUploadMediaUrlV2();
         try {
-            byte[] data = Files.readAllBytes(imageFile.toPath());
-            InputStream input = new ByteArrayInputStream(data);
-            return getRequestHelperV2().uploadMediaChunkedV2(url, imageFile.getName(), input, UploadMediaResponse.class, mediaCategory.label).orElseThrow(NoSuchElementException::new);
+            return getRequestHelperV2().uploadMediaChunkedV2(url, upFile, UploadMediaResponse.class, mediaCategory.label).orElseThrow(NoSuchElementException::new);
         } catch (Exception e) {
             LOGGER.error("uploadMedia is Exception!", e);
             throw new RuntimeException(e);

@@ -99,16 +99,28 @@ public abstract class AbstractRequestHelper {
     }
     try (Response response = getService().execute(request)) {
       String stringResponse = response.getBody();
-      LOGGER.debug("Response code: {} to url: '{}' headers: x-rate-limit-reset: {} x-rate-limit-remaining: {}", response.getCode(), request.getUrl(), response.getHeader("x-rate-limit-reset"), response.getHeader("x-rate-limit-remaining"));
+      String xRateLimitLimit = response.getHeader("x-rate-limit-limit");
+      String xRateLimitRemaining = response.getHeader("x-rate-limit-remaining");
+      String xRateLimitReset = response.getHeader("x-rate-limit-reset");
+      String xUserLimit24hourLimit = response.getHeader("x-user-limit-24hour-limit");
+      String xUserLimit24hourRemaining = response.getHeader("x-user-limit-24hour-remaining");
+      String xUserLimit24hourReset = response.getHeader("x-user-limit-24hour-reset");
+      String xAppLimit24hourLimit = response.getHeader("x-app-limit-24hour-limit");
+      String xAppLimit24hourRemaining = response.getHeader("x-app-limit-24hour-remaining");
+      String xAppLimit24hourReset = response.getHeader("x-app-limit-24hour-reset");
+      LOGGER.debug("Response code: {} to url: {}", response.getCode(), request.getUrl());
+      LOGGER.debug("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
+      LOGGER.debug("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
+      LOGGER.debug("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
 
       if (response.getCode() == 429) {
         if (!automaticRetry) {
-          throw new LimitExceededException(response.getHeader("x-rate-limit-reset"));
+          throw new LimitExceededException(xRateLimitReset);
         }
         int    retryAfter    = DEFAULT_RETRY_AFTER_SEC;
-        String retryAfterStr = response.getHeader("x-rate-limit-reset");
-        String rateRemainingStr = response.getHeader("x-rate-limit-remaining");
-        LOGGER.info("Rate limit exceeded, x-rate-limit-reset: {} x-rate-limit-remaining: {}, x-rate-limit-limit:  {}", retryAfterStr, response.getHeader("x-rate-limit-remaining"), response.getHeader("x-rate-limit-limit"));
+        String retryAfterStr = xRateLimitReset;
+        String rateRemainingStr = xRateLimitRemaining;
+        LOGGER.info("Rate limit exceeded, x-rate-limit-reset: {} x-rate-limit-remaining: {}, x-rate-limit-limit:  {}", retryAfterStr, xRateLimitRemaining, xRateLimitLimit);
         if (retryAfterStr != null && rateRemainingStr != null) {
           try {
        		int remaining  = Integer.parseInt(rateRemainingStr);
@@ -159,6 +171,20 @@ public abstract class AbstractRequestHelper {
     }
     Response response       = getService().execute(request);
     String   stringResponse = response.getBody();
+    String xRateLimitLimit = response.getHeader("x-rate-limit-limit");
+    String xRateLimitRemaining = response.getHeader("x-rate-limit-remaining");
+    String xRateLimitReset = response.getHeader("x-rate-limit-reset");
+    String xUserLimit24hourLimit = response.getHeader("x-user-limit-24hour-limit");
+    String xUserLimit24hourRemaining = response.getHeader("x-user-limit-24hour-remaining");
+    String xUserLimit24hourReset = response.getHeader("x-user-limit-24hour-reset");
+    String xAppLimit24hourLimit = response.getHeader("x-app-limit-24hour-limit");
+    String xAppLimit24hourRemaining = response.getHeader("x-app-limit-24hour-remaining");
+    String xAppLimit24hourReset = response.getHeader("x-app-limit-24hour-reset");
+    LOGGER.debug("Response code: {} to url: {}", response.getCode(), request.getUrl());
+    LOGGER.debug("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
+    LOGGER.debug("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
+    LOGGER.debug("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
+
     if (response.getCode() == 429) {
       if (!automaticRetry) {
         throw new LimitExceededException();
@@ -204,6 +230,20 @@ public abstract class AbstractRequestHelper {
     }
     Response response       = getService().execute(request);
     String   stringResponse = response.getBody();
+    String xRateLimitLimit = response.getHeader("x-rate-limit-limit");
+    String xRateLimitRemaining = response.getHeader("x-rate-limit-remaining");
+    String xRateLimitReset = response.getHeader("x-rate-limit-reset");
+    String xUserLimit24hourLimit = response.getHeader("x-user-limit-24hour-limit");
+    String xUserLimit24hourRemaining = response.getHeader("x-user-limit-24hour-remaining");
+    String xUserLimit24hourReset = response.getHeader("x-user-limit-24hour-reset");
+    String xAppLimit24hourLimit = response.getHeader("x-app-limit-24hour-limit");
+    String xAppLimit24hourRemaining = response.getHeader("x-app-limit-24hour-remaining");
+    String xAppLimit24hourReset = response.getHeader("x-app-limit-24hour-reset");
+    LOGGER.debug("Response code: {} to url: {}", response.getCode(), request.getUrl());
+    LOGGER.debug("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
+    LOGGER.debug("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
+    LOGGER.debug("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
+
     if (response.getCode() == 429) {
       if (!automaticRetry) {
         throw new LimitExceededException();
