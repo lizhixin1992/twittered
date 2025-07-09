@@ -108,10 +108,10 @@ public abstract class AbstractRequestHelper {
       String xAppLimit24hourLimit = response.getHeader("x-app-limit-24hour-limit");
       String xAppLimit24hourRemaining = response.getHeader("x-app-limit-24hour-remaining");
       String xAppLimit24hourReset = response.getHeader("x-app-limit-24hour-reset");
-      LOGGER.debug("Response code: {} to url: {}", response.getCode(), request.getUrl());
-      LOGGER.debug("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
-      LOGGER.debug("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
-      LOGGER.debug("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
+      LOGGER.info("Response code: {} to url: {}", response.getCode(), request.getUrl());
+      LOGGER.info("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
+      LOGGER.info("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
+      LOGGER.info("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
 
       if (response.getCode() == 429) {
         if (!automaticRetry) {
@@ -180,10 +180,10 @@ public abstract class AbstractRequestHelper {
     String xAppLimit24hourLimit = response.getHeader("x-app-limit-24hour-limit");
     String xAppLimit24hourRemaining = response.getHeader("x-app-limit-24hour-remaining");
     String xAppLimit24hourReset = response.getHeader("x-app-limit-24hour-reset");
-    LOGGER.debug("Response code: {} to url: {}", response.getCode(), request.getUrl());
-    LOGGER.debug("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
-    LOGGER.debug("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
-    LOGGER.debug("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
+    LOGGER.info("Response code: {} to url: {}", response.getCode(), request.getUrl());
+    LOGGER.info("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
+    LOGGER.info("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
+    LOGGER.info("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
 
     if (response.getCode() == 429) {
       if (!automaticRetry) {
@@ -239,10 +239,10 @@ public abstract class AbstractRequestHelper {
     String xAppLimit24hourLimit = response.getHeader("x-app-limit-24hour-limit");
     String xAppLimit24hourRemaining = response.getHeader("x-app-limit-24hour-remaining");
     String xAppLimit24hourReset = response.getHeader("x-app-limit-24hour-reset");
-    LOGGER.debug("Response code: {} to url: {}", response.getCode(), request.getUrl());
-    LOGGER.debug("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
-    LOGGER.debug("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
-    LOGGER.debug("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
+    LOGGER.info("Response code: {} to url: {}", response.getCode(), request.getUrl());
+    LOGGER.info("x-rate-limit-limit: {}, x-rate-limit-remaining: {}, x-rate-limit-reset: {}", xRateLimitLimit, xRateLimitRemaining, xRateLimitReset);
+    LOGGER.info("x-user-limit-24hour-limit: {}, x-user-limit-24hour-remaining: {}, x-user-limit-24hour-reset: {}", xUserLimit24hourLimit, xUserLimit24hourRemaining, xUserLimit24hourReset);
+    LOGGER.info("x-app-limit-24hour-limit: {}, x-app-limit-24hour-remaining: {}, x-app-limit-24hour-reset: {}", xAppLimit24hourLimit, xAppLimit24hourRemaining, xAppLimit24hourReset);
 
     if (response.getCode() == 429) {
       if (!automaticRetry) {
