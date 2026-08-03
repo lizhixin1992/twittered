@@ -1,7 +1,7 @@
 package io.github.redouane59.twitter.dto.tweet;
 
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSONException;
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Data;
 
 import java.util.Objects;
